@@ -1,0 +1,55 @@
+{
+  "name": "nexus",
+  "version": "1.0.0",
+  "description": "Nexus - Panneau de contrôle pour ampoules Tuya/Smart Life",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.nexus.app",
+    "productName": "Nexus",
+    "artifactName": "Nexus-${version}.exe",
+    "directories": {
+      "output": "dist"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "EaglesFPV",
+        "repo": "Nexus"
+      }
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "artifactName": "Nexus-Setup-${version}.exe",
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Nexus",
+      "runAfterFinish": true,
+      "installerLanguages": ["fr-FR"],
+      "language": "1036"
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "electron-updater": "^6.1.7",
+    "tuyapi": "^7.5.0"
+  }
+}

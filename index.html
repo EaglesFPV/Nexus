@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Nexus</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface2: #22222e;
+      --border: #2e2e3e;
+      --accent: #7c6af7;
+      --accent2: #a78bfa;
+      --text: #e8e8f0;
+      --text-dim: #6b6b80;
+      --on: #4ade80;
+      --off: #ef4444;
+      --radius: 14px;
+    }
+
+    body {
+      font-family: -apple-system, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Titlebar */
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      -webkit-app-region: drag;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .titlebar-left { display: flex; align-items: center; gap: 10px; }
+    .titlebar-icon { font-size: 20px; }
+    .titlebar-title { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent2); }
+    .titlebar-controls { display: flex; gap: 8px; -webkit-app-region: no-drag; }
+    .btn-win {
+      width: 28px; height: 28px; border-radius: 8px; border: none;
+      cursor: pointer; font-size: 13px; display: flex; align-items: center;
+      justify-content: center; transition: background 0.15s;
+      background: var(--surface2); color: var(--text-dim);
+    }
+    .btn-win:hover { background: var(--border); color: var(--text); }
+    .btn-win.close:hover { background: #ef4444; color: #fff; }
+
+    /* Main scroll */
+    .main { height: calc(100vh - 57px); overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
+    .main::-webkit-scrollbar { width: 4px; }
+    .main::-webkit-scrollbar-track { background: transparent; }
+    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    /* Section title */
+    .section-title {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1.2px; color: var(--text-dim); margin-bottom: 2px;
+    }
+
+    /* Device card */
+    .device-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      transition: border-color 0.2s;
+    }
+    .device-card.active { border-color: var(--accent); }
+
+    .device-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .device-name { font-size: 15px; font-weight: 600; }
+    .device-status {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 12px; color: var(--text-dim);
+    }
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--off); transition: background 0.3s;
+    }
+    .status-dot.on { background: var(--on); box-shadow: 0 0 6px var(--on); }
+
+    /* Toggle */
+    .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+    .toggle {
+      position: relative; width: 48px; height: 26px; cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; background: var(--surface2);
+      border-radius: 13px; border: 1px solid var(--border);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 18px; height: 18px; background: #fff;
+      border-radius: 50%; transition: transform 0.2s;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    }
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(22px); }
+    .toggle-label { font-size: 13px; color: var(--text-dim); }
+
+    /* Sliders */
+    .control-group { margin-bottom: 12px; }
+    .control-label {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: var(--text-dim); margin-bottom: 7px;
+    }
+    .control-label span:last-child { color: var(--accent2); font-weight: 600; }
+
+    input[type=range] {
+      -webkit-appearance: none; width: 100%; height: 4px;
+      background: var(--surface2); border-radius: 2px; outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none; width: 16px; height: 16px;
+      border-radius: 50%; background: var(--accent2);
+      box-shadow: 0 0 0 3px rgba(124,106,247,0.25);
+      transition: box-shadow 0.15s;
+    }
+    input[type=range]::-webkit-slider-thumb:hover {
+      box-shadow: 0 0 0 5px rgba(124,106,247,0.35);
+    }
+
+    /* Color picker */
+    .color-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .color-preview {
+      width: 36px; height: 36px; border-radius: 10px;
+      border: 2px solid var(--border); cursor: pointer;
+      flex-shrink: 0; transition: border-color 0.2s;
+    }
+    .color-preview:hover { border-color: var(--accent); }
+    input[type=color] { opacity: 0; width: 0; height: 0; position: absolute; }
+    .color-label { font-size: 12px; color: var(--text-dim); }
+
+    /* Mode tabs */
+    .mode-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+    .mode-tab {
+      flex: 1; padding: 7px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--surface2); color: var(--text-dim); font-size: 12px;
+      font-weight: 500; cursor: pointer; text-align: center; transition: all 0.15s;
+    }
+    .mode-tab.active {
+      background: var(--accent); border-color: var(--accent); color: #fff;
+    }
+
+    /* Config panel */
+    .config-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px;
+    }
+    .config-row { margin-bottom: 10px; }
+    .config-row label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 5px; }
+    .config-row input {
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 10px; color: var(--text);
+      font-size: 13px; outline: none; transition: border-color 0.15s;
+    }
+    .config-row input:focus { border-color: var(--accent); }
+
+    /* Buttons */
+    .btn {
+      padding: 9px 16px; border-radius: 9px; border: none;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-ghost { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
+    .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+
+    .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(60px);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 18px; font-size: 13px;
+      color: var(--text); transition: transform 0.25s; z-index: 100;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: var(--on); color: var(--on); }
+    .toast.error { border-color: var(--off); color: var(--off); }
+  </style>
+</head>
+<body>
+
+<!-- Titlebar -->
+<div class="titlebar">
+  <div class="titlebar-left">
+    <span class="titlebar-icon">💡</span>
+    <span class="titlebar-title">Nexus</span>
+  </div>
+  <div class="titlebar-controls">
+    <button class="btn-win" onclick="toggleConfig()" title="Paramètres">⚙</button>
+    <button class="btn-win" onclick="window.minimize()">─</button>
+    <button class="btn-win close" onclick="window.close()">✕</button>
+  </div>
+</div>
+
+<div class="main" id="main">
+
+  <!-- Config Panel (hidden by default) -->
+  <div id="configPanel" style="display:none">
+    <div class="section-title">Configuration API Tuya</div>
+    <div class="config-card">
+      <div class="config-row">
+        <label>Client ID</label>
+        <input id="cfgClientId" type="text" placeholder="7ghm3r5ytan8u3ysnrxr"/>
+      </div>
+      <div class="config-row">
+        <label>Client Secret</label>
+        <input id="cfgClientSecret" type="password" placeholder="••••••••••••••••"/>
+      </div>
+      <div class="config-row">
+        <label>Région</label>
+        <input id="cfgRegion" type="text" value="eu" placeholder="eu"/>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="saveConfig()">💾 Sauvegarder</button>
+        <button class="btn btn-ghost" onclick="toggleConfig()">Annuler</button>
+      </div>
+    </div>
+
+    <div class="section-title" style="margin-top:14px">Appareils</div>
+    <div class="config-card">
+      <div id="deviceConfigList"></div>
+      <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="addDevice()">+ Ajouter un appareil</button>
+    </div>
+  </div>
+
+  <!-- Main Panel -->
+  <div id="mainPanel">
+    <div class="section-title">Mes ampoules</div>
+    <div id="deviceList"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const { ipcRenderer } = require('electron');
+const { getCurrentWindow } = require('@electron/remote') || {};
+
+// Window controls
+window.minimize = () => { try { require('electron').remote.getCurrentWindow().minimize(); } catch {} };
+window.close    = () => { try { require('electron').remote.getCurrentWindow().close(); } catch(e) { ipcRenderer.send('close-window'); } };
+
+// ─── State ────────────────────────────────────────────────────────────────────
+let config = { clientId: '', clientSecret: '', region: 'eu', devices: [] };
+let deviceStates = {};
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+async function init() {
+  config = await ipcRenderer.invoke('get-config');
+
+  // Pre-fill defaults if empty
+  if (!config.devices || config.devices.length === 0) {
+    config.devices = [
+      { id: 'bf685831b2535c78dezqnx', name: 'Ampoule 1' },
+      { id: 'bf52db492af411c028kqeb',  name: 'Ampoule 2' }
+    ];
+  }
+
+  renderDevices();
+  refreshAllStatus();
+}
+
+// ─── Render Devices ───────────────────────────────────────────────────────────
+function renderDevices() {
+  const list = document.getElementById('deviceList');
+  list.innerHTML = '';
+
+  config.devices.forEach(device => {
+    deviceStates[device.id] = deviceStates[device.id] || { on: false, mode: 'white', brightness: 500, temp: 500, h: 0, s: 0, v: 500 };
+    list.appendChild(createDeviceCard(device));
+  });
+}
+
+function createDeviceCard(device) {
+  const s = deviceStates[device.id];
+  const card = document.createElement('div');
+  card.className = `device-card ${s.on ? 'active' : ''}`;
+  card.id = `card-${device.id}`;
+  card.innerHTML = `
+    <div class="device-header">
+      <span class="device-name">${device.name}</span>
+      <div class="device-status">
+        <div class="status-dot ${s.on ? 'on' : ''}" id="dot-${device.id}"></div>
+        <span id="statusText-${device.id}">${s.on ? 'Allumée' : 'Éteinte'}</span>
+      </div>
+    </div>
+
+    <div class="mode-tabs">
+      <div class="mode-tab ${s.mode === 'white' ? 'active' : ''}" onclick="setMode('${device.id}', 'white')">⬜ Blanc</div>
+      <div class="mode-tab ${s.mode === 'colour' ? 'active' : ''}" onclick="setMode('${device.id}', 'colour')">🎨 Couleur</div>
+    </div>
+
+    <div class="toggle-row">
+      <label class="toggle">
+        <input type="checkbox" ${s.on ? 'checked' : ''} onchange="toggleDevice('${device.id}', this.checked)" id="toggle-${device.id}">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+      <span class="toggle-label">${s.on ? 'Allumée' : 'Éteinte'}</span>
+    </div>
+
+    <div id="white-controls-${device.id}" style="${s.mode !== 'white' ? 'display:none' : ''}">
+      <div class="control-group">
+        <div class="control-label"><span>☀ Luminosité</span><span id="brightVal-${device.id}">${s.brightness}</span></div>
+        <input type="range" min="10" max="1000" value="${s.brightness}"
+          oninput="updateBrightLabel('${device.id}', this.value)"
+          onchange="setBrightness('${device.id}', this.value)"
+          id="bright-${device.id}">
+      </div>
+      <div class="control-group">
+        <div class="control-label"><span>🌡 Température</span><span id="tempVal-${device.id}">${s.temp <= 500 ? 'Chaud' : 'Froid'}</span></div>
+        <input type="range" min="0" max="1000" value="${s.temp}"
+          oninput="updateTempLabel('${device.id}', this.value)"
+          onchange="setTemp('${device.id}', this.value)"
+          id="temp-${device.id}">
+      </div>
+    </div>
+
+    <div id="colour-controls-${device.id}" style="${s.mode !== 'colour' ? 'display:none' : ''}">
+      <div class="color-row">
+        <div class="color-preview" id="colorPreview-${device.id}" style="background: hsl(${s.h},100%,50%)" onclick="openColorPicker('${device.id}')"></div>
+        <input type="color" id="colorPicker-${device.id}" oninput="onColorPick('${device.id}', this.value)">
+        <span class="color-label">Cliquez pour choisir la couleur</span>
+      </div>
+      <div class="control-group">
+        <div class="control-label"><span>✨ Intensité</span><span id="colorBrightVal-${device.id}">${s.v}</span></div>
+        <input type="range" min="0" max="1000" value="${s.v}"
+          oninput="updateColorBrightLabel('${device.id}', this.value)"
+          onchange="applyColorBright('${device.id}', this.value)"
+          id="colorBright-${device.id}">
+      </div>
+    </div>
+  `;
+  return card;
+}
+
+// ─── Controls ────────────────────────────────────────────────────────────────
+async function toggleDevice(id, on) {
+  const res = await ipcRenderer.invoke(on ? 'turn-on' : 'turn-off', id);
+  if (res.success) {
+    deviceStates[id].on = on;
+    updateCardState(id);
+    toast(on ? '💡 Allumée' : '🌙 Éteinte', 'success');
+  } else {
+    toast('Erreur: ' + res.msg, 'error');
+    document.getElementById(`toggle-${id}`).checked = !on;
+  }
+}
+
+async function setBrightness(id, value) {
+  const res = await ipcRenderer.invoke('set-brightness', id, parseInt(value));
+  if (!res.success) toast('Erreur luminosité', 'error');
+}
+
+async function setTemp(id, value) {
+  const res = await ipcRenderer.invoke('set-temp', id, parseInt(value));
+  if (!res.success) toast('Erreur température', 'error');
+}
+
+function setMode(id, mode) {
+  deviceStates[id].mode = mode;
+  document.querySelectorAll(`#card-${id} .mode-tab`).forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && mode === 'white') || (i === 1 && mode === 'colour'));
+  });
+  document.getElementById(`white-controls-${id}`).style.display = mode === 'white' ? '' : 'none';
+  document.getElementById(`colour-controls-${id}`).style.display = mode === 'colour' ? '' : 'none';
+}
+
+function openColorPicker(id) {
+  document.getElementById(`colorPicker-${id}`).click();
+}
+
+function onColorPick(id, hex) {
+  document.getElementById(`colorPreview-${id}`).style.background = hex;
+  const [h, s, v] = hexToHSV(hex);
+  deviceStates[id] = { ...deviceStates[id], h, s, v };
+  ipcRenderer.invoke('set-color', id, h, Math.round(s * 1000), Math.round(v * 1000));
+}
+
+function applyColorBright(id, value) {
+  const s = deviceStates[id];
+  deviceStates[id].v = parseInt(value);
+  ipcRenderer.invoke('set-color', id, s.h, Math.round(s.s * 1000), parseInt(value));
+}
+
+// ─── Labels ───────────────────────────────────────────────────────────────────
+function updateBrightLabel(id, v) {
+  document.getElementById(`brightVal-${id}`).textContent = v;
+  deviceStates[id].brightness = parseInt(v);
+}
+function updateTempLabel(id, v) {
+  document.getElementById(`tempVal-${id}`).textContent = parseInt(v) <= 500 ? 'Chaud' : 'Froid';
+  deviceStates[id].temp = parseInt(v);
+}
+function updateColorBrightLabel(id, v) {
+  document.getElementById(`colorBrightVal-${id}`).textContent = v;
+}
+
+// ─── Status ───────────────────────────────────────────────────────────────────
+async function refreshAllStatus() {
+  for (const device of config.devices) {
+    const res = await ipcRenderer.invoke('get-status', device.id);
+    if (res.success && res.result) {
+      const dps = {};
+      res.result.forEach(dp => { dps[dp.code] = dp.value; });
+      deviceStates[device.id] = {
+        on: dps.switch_led || false,
+        mode: dps.work_mode || 'white',
+        brightness: dps.bright_value_v2 || 500,
+        temp: dps.temp_value_v2 || 500,
+        h: dps.colour_data_v2?.h || 0,
+        s: (dps.colour_data_v2?.s || 0) / 1000,
+        v: dps.colour_data_v2?.v || 500
+      };
+    }
+  }
+  renderDevices();
+}
+
+function updateCardState(id) {
+  const s = deviceStates[id];
+  const card = document.getElementById(`card-${id}`);
+  if (!card) return;
+  card.classList.toggle('active', s.on);
+  document.getElementById(`dot-${id}`).className = `status-dot ${s.on ? 'on' : ''}`;
+  document.getElementById(`statusText-${id}`).textContent = s.on ? 'Allumée' : 'Éteinte';
+}
+
+// ─── Config panel ─────────────────────────────────────────────────────────────
+function toggleConfig() {
+  const panel = document.getElementById('configPanel');
+  const main  = document.getElementById('mainPanel');
+  const show  = panel.style.display === 'none';
+  panel.style.display = show ? '' : 'none';
+  main.style.display  = show ? 'none' : '';
+  if (show) {
+    document.getElementById('cfgClientId').value     = config.clientId;
+    document.getElementById('cfgClientSecret').value = config.clientSecret;
+    document.getElementById('cfgRegion').value       = config.region;
+    renderDeviceConfig();
+  }
+}
+
+function renderDeviceConfig() {
+  const list = document.getElementById('deviceConfigList');
+  list.innerHTML = '';
+  config.devices.forEach((d, i) => {
+    list.innerHTML += `
+      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+        <input style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none"
+          value="${d.name}" placeholder="Nom" oninput="config.devices[${i}].name = this.value">
+        <input style="flex:2;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none"
+          value="${d.id}" placeholder="Device ID" oninput="config.devices[${i}].id = this.value">
+        <button class="btn btn-ghost" style="padding:7px 10px" onclick="removeDevice(${i})">✕</button>
+      </div>`;
+  });
+}
+
+function addDevice() {
+  config.devices.push({ id: '', name: 'Nouvelle ampoule' });
+  renderDeviceConfig();
+}
+
+function removeDevice(i) {
+  config.devices.splice(i, 1);
+  renderDeviceConfig();
+}
+
+async function saveConfig() {
+  config.clientId     = document.getElementById('cfgClientId').value.trim();
+  config.clientSecret = document.getElementById('cfgClientSecret').value.trim();
+  config.region       = document.getElementById('cfgRegion').value.trim();
+  await ipcRenderer.invoke('save-config', config);
+  toast('Configuration sauvegardée ✓', 'success');
+  toggleConfig();
+  renderDevices();
+  refreshAllStatus();
+}
+
+// ─── Utils ────────────────────────────────────────────────────────────────────
+function hexToHSV(hex) {
+  let r = parseInt(hex.slice(1,3),16)/255;
+  let g = parseInt(hex.slice(3,5),16)/255;
+  let b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
+  let h = 0, s = max ? d/max : 0, v = max;
+  if (d) {
+    if (max===r) h = ((g-b)/d)%6;
+    else if (max===g) h = (b-r)/d+2;
+    else h = (r-g)/d+4;
+    h = Math.round(h*60); if (h<0) h+=360;
+  }
+  return [h, s, v];
+}
+
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type} show`;
+  setTimeout(() => t.className = 'toast', 2500);
+}
+
+init();
+</script>
+</body>
+</html>
