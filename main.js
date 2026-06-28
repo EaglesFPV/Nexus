@@ -139,11 +139,10 @@ ipcMain.handle('poll-qr', async (e, qrcode) => {
 ipcMain.handle('get-devices', async () => {
   try {
     await getToken();
-    const res = await tuyaRequest('GET', `/v2.0/cloud/thing/device?page_no=1&page_size=50`);
+    const res = await tuyaRequest('GET', `/v1.0/iot-01/associated-users/devices?last_row_key=&page_size=50`);
     if (res.success && res.result) {
-      res.result.devices = (res.result.devices || res.result.list || []).map(d => ({
-        ...d, _category: detectCategory(d)
-      }));
+      const list = res.result.devices || res.result.list || res.result || [];
+      res.result = { devices: (Array.isArray(list) ? list : []).map(d => ({ ...d, _category: detectCategory(d) })) };
     }
     return res;
   } catch (err) { return { success: false, msg: err.message }; }
