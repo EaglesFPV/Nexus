@@ -5,301 +5,181 @@
 <title>Nexus</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-
 :root{
-  --bg:#0c0c10;
-  --s1:#13131a;
-  --s2:#1a1a24;
-  --s3:#22222e;
-  --border:#2a2a38;
-  --border2:#333344;
-  --accent:#6c63f5;
-  --accent-dim:#4a4580;
-  --accent-glow:rgba(108,99,245,0.18);
-  --text:#ddddf0;
-  --text-dim:#6b6b88;
-  --text-muted:#44445a;
-  --on:#3dd68c;
-  --off:#f04747;
-  --r:12px;
-  --r-sm:8px;
+  --bg:#0c0c10;--s1:#13131a;--s2:#1a1a24;--s3:#22222e;
+  --border:#2a2a38;--border2:#333344;
+  --accent:#6c63f5;--accent-lo:rgba(108,99,245,.15);--accent-glow:rgba(108,99,245,.22);
+  --text:#ddddf0;--text-dim:#6b6b88;--text-muted:#3a3a52;
+  --on:#3dd68c;--off:#f04747;--r:14px;--r-sm:9px;
 }
-
-body{
-  font-family:'Segoe UI',system-ui,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  height:100vh;
-  overflow:hidden;
-  user-select:none;
-  -webkit-font-smoothing:antialiased;
-}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;user-select:none;-webkit-font-smoothing:antialiased}
 
 /* ── Titlebar ── */
-.titlebar{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px;
-  -webkit-app-region:drag;
-  border-bottom:1px solid var(--border);
-  background:var(--bg);
-}
+.titlebar{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;-webkit-app-region:drag;border-bottom:1px solid var(--border);background:var(--bg)}
 .tb-left{display:flex;align-items:center;gap:9px}
-.tb-logo{
-  width:28px;height:28px;border-radius:8px;
-  background:linear-gradient(135deg,var(--accent),#9c6af5);
-  display:flex;align-items:center;justify-content:center;
-  font-size:14px;flex-shrink:0;
-}
-.tb-name{font-size:14px;font-weight:700;letter-spacing:.3px;color:var(--text)}
-.tb-tag{font-size:10px;color:var(--text-dim);margin-top:1px}
-.tb-controls{display:flex;gap:6px;-webkit-app-region:no-drag}
-.wbtn{
-  width:26px;height:26px;border-radius:7px;border:none;
-  background:var(--s3);color:var(--text-dim);cursor:pointer;
-  font-size:12px;display:flex;align-items:center;justify-content:center;
-  transition:all .15s;
-}
+.tb-logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),#9c6af5);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.tb-name{font-size:14px;font-weight:700;letter-spacing:.3px}
+.tb-controls{display:flex;gap:5px;-webkit-app-region:no-drag}
+.wbtn{width:26px;height:26px;border-radius:7px;border:none;background:var(--s3);color:var(--text-dim);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .wbtn:hover{background:var(--border2);color:var(--text)}
 .wbtn.close:hover{background:var(--off);color:#fff}
 
-/* ── Scroll area ── */
-.scroll{
-  height:calc(100vh - 53px);
-  overflow-y:auto;
-  overflow-x:hidden;
-  padding:16px;
-  display:flex;flex-direction:column;gap:12px;
-}
+/* ── Layout ── */
+.app{display:flex;height:calc(100vh - 56px)}
+.sidebar{width:64px;background:var(--s1);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;flex-shrink:0}
+.main-area{flex:1;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── Sidebar nav ── */
+.nav-item{width:44px;height:44px;border-radius:12px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:all .15s;font-size:18px;position:relative}
+.nav-item:hover{background:var(--s2);color:var(--text-dim)}
+.nav-item.active{background:var(--accent-lo);color:var(--accent)}
+.nav-item.active::before{content:'';position:absolute;left:-12px;top:50%;transform:translateY(-50%);width:3px;height:20px;background:var(--accent);border-radius:2px}
+
+/* ── Scroll ── */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:16px}
 .scroll::-webkit-scrollbar{width:3px}
 .scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
 /* ── Pages ── */
-.page{display:none;flex-direction:column;gap:12px}
+.page{display:none;flex-direction:column;gap:14px}
 .page.active{display:flex}
 
-/* ── Setup page ── */
-.setup-hero{
-  background:linear-gradient(135deg,var(--s2),var(--s1));
-  border:1px solid var(--border);
-  border-radius:var(--r);
-  padding:24px 20px;
-  text-align:center;
-}
-.setup-icon{font-size:36px;margin-bottom:12px}
-.setup-title{font-size:18px;font-weight:700;margin-bottom:6px}
-.setup-sub{font-size:13px;color:var(--text-dim);line-height:1.5}
+/* ── Page header ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.page-title{font-size:18px;font-weight:700}
+.page-sub{font-size:12px;color:var(--text-dim);margin-top:2px}
 
-.step-card{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);padding:16px;
-}
-.step-header{
-  display:flex;align-items:center;gap:10px;margin-bottom:14px;
-}
-.step-num{
-  width:24px;height:24px;border-radius:50%;
-  background:var(--accent);color:#fff;
-  font-size:11px;font-weight:700;
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
+/* ── Room grid ── */
+.room-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.room-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .2s;position:relative}
+.room-card:hover{border-color:var(--border2);background:var(--s2)}
+.room-card.active-room{border-color:var(--accent);background:var(--accent-lo)}
+.room-icon{font-size:24px;margin-bottom:8px}
+.room-name{font-size:13px;font-weight:600;margin-bottom:3px}
+.room-count{font-size:11px;color:var(--text-dim)}
+.room-add{border:1px dashed var(--border2);background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-height:90px;color:var(--text-muted)}
+.room-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-lo)}
+.room-add-icon{font-size:22px}
+.room-add-label{font-size:11px;font-weight:500}
+
+/* ── Device list ── */
+.device-list{display:flex;flex-direction:column;gap:8px}
+.device-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
+.device-card.on{border-color:var(--accent-glow)}
+.dc-main{display:flex;align-items:center;padding:13px 14px;gap:11px;cursor:pointer}
+.dc-icon{width:38px;height:38px;border-radius:11px;background:var(--s3);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:background .2s}
+.device-card.on .dc-icon{background:var(--accent-lo);border-color:var(--accent-glow)}
+.dc-info{flex:1;min-width:0}
+.dc-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dc-meta{font-size:11px;color:var(--text-dim);margin-top:2px}
+.dc-expand{color:var(--text-muted);font-size:12px;transition:transform .2s;flex-shrink:0;margin-right:4px}
+.device-card.expanded .dc-expand{transform:rotate(180deg)}
+
+/* ── Toggle ── */
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.t-track{position:absolute;inset:0;border-radius:12px;background:var(--s3);border:1px solid var(--border);transition:all .2s}
+.toggle input:checked+.t-track{background:var(--accent);border-color:var(--accent)}
+.t-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.toggle input:checked~.t-thumb{transform:translateX(20px)}
+
+/* ── Controls panel ── */
+.ctrl-panel{padding:0 14px 14px;border-top:1px solid var(--border);background:var(--s2)}
+
+/* Mode tabs */
+.mode-tabs{display:flex;gap:6px;padding-top:12px;margin-bottom:12px}
+.mode-tab{flex:1;padding:7px;border-radius:8px;border:1px solid var(--border);background:var(--s3);color:var(--text-dim);font-size:11px;font-weight:600;cursor:pointer;text-align:center;transition:all .15s}
+.mode-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+/* Sliders */
+.slider-group{margin-bottom:12px}
+.slider-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text-dim);margin-bottom:7px}
+.slider-label span:last-child{color:var(--accent);font-weight:600}
+input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--s3);border-radius:2px;outline:none;cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(108,99,245,.2);transition:box-shadow .15s}
+input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(108,99,245,.28)}
+
+/* Temperature slider gradient */
+.temp-track{position:relative}
+.temp-track input[type=range]{background:linear-gradient(to right,#ff9a3c,#fff5e0,#c5deff)}
+
+/* ── Color wheel ── */
+.color-section{display:flex;gap:14px;align-items:flex-start;margin-bottom:12px}
+.wheel-wrap{position:relative;width:110px;height:110px;flex-shrink:0}
+#colorWheel{border-radius:50%;cursor:crosshair;display:block}
+.wheel-cursor{position:absolute;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.4);transform:translate(-50%,-50%);pointer-events:none;transition:left .05s,top .05s}
+.color-sliders{flex:1;display:flex;flex-direction:column;gap:10px;padding-top:4px}
+.color-preview-strip{height:28px;border-radius:8px;margin-bottom:12px;border:1px solid var(--border);transition:background .1s}
+
+/* Switch stats */
+.switch-stats{display:flex;gap:8px;padding-top:12px}
+.stat-box{flex:1;background:var(--s3);border-radius:10px;padding:10px 12px;border:1px solid var(--border)}
+.stat-icon{font-size:14px;margin-bottom:4px}
+.stat-label{font-size:10px;color:var(--text-dim);margin-bottom:2px}
+.stat-val{font-size:14px;font-weight:700}
+
+/* ── Setup ── */
+.setup-wrap{display:flex;flex-direction:column;gap:12px}
+.setup-hero{background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--border);border-radius:var(--r);padding:24px 20px;text-align:center}
+.setup-logo{font-size:38px;margin-bottom:10px}
+.setup-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.setup-sub{font-size:13px;color:var(--text-dim);line-height:1.6}
+.step-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.step-hd{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .step-title{font-size:13px;font-weight:600}
 .step-sub{font-size:11px;color:var(--text-dim);margin-top:1px}
-
 .field{margin-bottom:10px}
 .field label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:500}
-.field input,.field select{
-  width:100%;background:var(--s3);border:1px solid var(--border);
-  border-radius:var(--r-sm);padding:9px 11px;
-  color:var(--text);font-size:13px;outline:none;
-  transition:border-color .15s;
-}
+.field input,.field select{width:100%;background:var(--s3);border:1px solid var(--border);border-radius:var(--r-sm);padding:9px 11px;color:var(--text);font-size:13px;outline:none;transition:border-color .15s}
 .field input:focus,.field select:focus{border-color:var(--accent)}
 .field input::placeholder{color:var(--text-muted)}
 .field select option{background:var(--s3)}
-
-.link{color:var(--accent);font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.link{color:var(--accent);font-size:11px;text-decoration:none}
 .link:hover{color:#9c8fff}
 
-/* ── QR ── */
-.qr-wrap{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);padding:20px;text-align:center;
-}
-.qr-title{font-size:14px;font-weight:600;margin-bottom:6px}
-.qr-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px;line-height:1.5}
-#qrCanvas{
-  border-radius:10px;background:#fff;padding:10px;
-  display:block;margin:0 auto 14px;
-}
-.qr-status{
-  display:flex;align-items:center;justify-content:center;gap:7px;
-  font-size:12px;color:var(--text-dim);
-}
-.pulse-dot{
-  width:8px;height:8px;border-radius:50%;background:var(--accent);
-  animation:pulse 1.4s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
-
 /* ── Buttons ── */
-.btn{
-  padding:10px 18px;border-radius:var(--r-sm);border:none;
-  cursor:pointer;font-size:13px;font-weight:600;
-  transition:all .15s;display:inline-flex;align-items:center;
-  justify-content:center;gap:7px;width:100%;
-}
+.btn{padding:9px 16px;border-radius:var(--r-sm);border:none;cursor:pointer;font-size:13px;font-weight:600;transition:all .15s;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:100%}
 .btn-primary{background:var(--accent);color:#fff}
-.btn-primary:hover{background:#7c74f7;transform:translateY(-1px)}
-.btn-primary:active{transform:translateY(0)}
-.btn-ghost{
-  background:transparent;color:var(--text-dim);
-  border:1px solid var(--border);
-}
+.btn-primary:hover{background:#7c74f7}
+.btn-ghost{background:transparent;color:var(--text-dim);border:1px solid var(--border)}
 .btn-ghost:hover{border-color:var(--border2);color:var(--text)}
-.btn-danger{background:rgba(240,71,71,.12);color:var(--off);border:1px solid rgba(240,71,71,.2)}
+.btn-danger{background:rgba(240,71,71,.1);color:var(--off);border:1px solid rgba(240,71,71,.2)}
 .btn-danger:hover{background:rgba(240,71,71,.2)}
+.btn-sm{padding:6px 12px;font-size:12px;width:auto}
 
-/* ── Main page ── */
-.section-label{
-  font-size:10px;font-weight:700;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--text-muted);
-  padding:0 2px;
-}
+/* ── Modal ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:var(--r);padding:20px;width:300px;max-width:90%}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:14px}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+.modal-actions .btn{flex:1}
 
-.device-card{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px;
-  transition:border-color .2s,box-shadow .2s;
-}
-.device-card.on{
-  border-color:var(--accent-dim);
-  box-shadow:0 0 0 1px var(--accent-dim),inset 0 0 20px var(--accent-glow);
-}
-
-.dc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.dc-info{display:flex;align-items:center;gap:10px}
-.dc-icon{
-  width:36px;height:36px;border-radius:10px;
-  background:var(--s3);border:1px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  font-size:17px;flex-shrink:0;
-}
-.dc-name{font-size:14px;font-weight:600;line-height:1.2}
-.dc-type{font-size:11px;color:var(--text-dim);margin-top:2px}
-
-/* Toggle */
-.toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0;position:absolute}
-.t-track{
-  position:absolute;inset:0;border-radius:12px;
-  background:var(--s3);border:1px solid var(--border);
-  transition:all .2s;
-}
-.toggle input:checked+.t-track{background:var(--accent);border-color:var(--accent)}
-.t-thumb{
-  position:absolute;top:3px;left:3px;
-  width:16px;height:16px;background:#fff;border-radius:50%;
-  transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4);
-}
-.toggle input:checked~.t-thumb{transform:translateX(20px)}
-
-/* Light controls */
-.light-controls,.switch-controls{margin-top:10px;display:flex;flex-direction:column;gap:10px}
-
-.mode-row{display:flex;gap:6px}
-.mode-btn{
-  flex:1;padding:6px;border-radius:7px;
-  border:1px solid var(--border);background:var(--s3);
-  color:var(--text-dim);font-size:11px;font-weight:500;
-  cursor:pointer;text-align:center;transition:all .15s;
-}
-.mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-
-.ctrl-group{}
-.ctrl-label{
-  display:flex;justify-content:space-between;
-  font-size:11px;color:var(--text-dim);margin-bottom:6px;
-}
-.ctrl-label span:last-child{color:var(--accent);font-weight:600}
-
-input[type=range]{
-  -webkit-appearance:none;width:100%;height:3px;
-  background:var(--s3);border-radius:2px;outline:none;cursor:pointer;
-}
-input[type=range]::-webkit-slider-thumb{
-  -webkit-appearance:none;width:14px;height:14px;
-  border-radius:50%;background:var(--accent);
-  box-shadow:0 0 0 3px rgba(108,99,245,.2);
-  transition:box-shadow .15s;
-}
-input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(108,99,245,.3)}
-
-.color-row{display:flex;align-items:center;gap:10px}
-.color-swatch{
-  width:32px;height:32px;border-radius:8px;
-  border:2px solid var(--border);cursor:pointer;flex-shrink:0;
-  transition:border-color .15s;
-}
-.color-swatch:hover{border-color:var(--accent)}
-input[type=color]{opacity:0;width:0;height:0;position:absolute}
-.color-hint{font-size:11px;color:var(--text-dim)}
-
-/* Switch power info */
-.switch-info{
-  display:flex;align-items:center;gap:8px;
-  background:var(--s3);border-radius:8px;padding:9px 12px;
-}
-.switch-info-icon{font-size:16px}
-.switch-info-text{font-size:12px;color:var(--text-dim)}
-.switch-info-val{font-size:13px;font-weight:600;color:var(--text);margin-top:1px}
+/* Icon picker */
+.icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px}
+.icon-opt{width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--s3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s}
+.icon-opt:hover{border-color:var(--accent);background:var(--accent-lo)}
+.icon-opt.selected{border-color:var(--accent);background:var(--accent-lo)}
 
 /* ── Config page ── */
-.cfg-section{
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);padding:14px;
-}
-.cfg-title{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px}
+.cfg-section{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.cfg-title{font-size:11px;font-weight:700;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px}
 
-/* ── Empty state ── */
-.empty{
-  text-align:center;padding:32px 20px;
-  background:var(--s1);border:1px solid var(--border);
-  border-radius:var(--r);
-}
-.empty-icon{font-size:32px;margin-bottom:10px;opacity:.4}
-.empty-text{font-size:13px;color:var(--text-dim);margin-bottom:14px}
+/* ── Empty ── */
+.empty{text-align:center;padding:30px 20px;background:var(--s1);border:1px dashed var(--border2);border-radius:var(--r)}
+.empty-icon{font-size:30px;margin-bottom:8px;opacity:.35}
+.empty-text{font-size:12px;color:var(--text-dim);line-height:1.6}
 
 /* ── Toast ── */
-.toast{
-  position:fixed;bottom:16px;left:50%;
-  transform:translateX(-50%) translateY(80px);
-  background:var(--s2);border:1px solid var(--border2);
-  border-radius:10px;padding:9px 16px;font-size:12px;
-  color:var(--text);z-index:999;transition:transform .25s;
-  white-space:nowrap;pointer-events:none;
-}
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--border2);border-radius:10px;padding:8px 16px;font-size:12px;color:var(--text);z-index:999;transition:transform .25s;white-space:nowrap;pointer-events:none}
 .toast.show{transform:translateX(-50%) translateY(0)}
 .toast.ok{border-color:rgba(61,214,140,.4);color:var(--on)}
 .toast.err{border-color:rgba(240,71,71,.4);color:var(--off)}
 
-/* ── Nav ── */
-.nav{
-  position:fixed;bottom:0;left:0;right:0;
-  display:flex;background:var(--bg);
-  border-top:1px solid var(--border);
-  padding:8px 16px 10px;gap:4px;
-}
-.nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  gap:3px;padding:6px;border-radius:8px;border:none;
-  background:transparent;color:var(--text-muted);cursor:pointer;
-  font-size:10px;font-weight:500;transition:all .15s;
-}
-.nav-btn.active{color:var(--accent);background:var(--accent-glow)}
-.nav-btn:hover:not(.active){color:var(--text-dim)}
-.nav-icon{font-size:18px}
-
-.has-nav .scroll{height:calc(100vh - 53px - 60px)}
+/* ── Section label ── */
+.section-label{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px}
+.row{display:flex;align-items:center;justify-content:space-between}
 </style>
 </head>
 <body>
@@ -308,166 +188,186 @@ input[type=color]{opacity:0;width:0;height:0;position:absolute}
 <div class="titlebar">
   <div class="tb-left">
     <div class="tb-logo">⚡</div>
-    <div>
-      <div class="tb-name">Nexus</div>
-    </div>
+    <span class="tb-name">Nexus</span>
   </div>
   <div class="tb-controls">
-    <button class="wbtn" onclick="ipc('minimize-window')" title="Réduire">─</button>
-    <button class="wbtn close" onclick="ipc('close-window')" title="Fermer">✕</button>
+    <button class="wbtn" onclick="ipc('minimize-window')">─</button>
+    <button class="wbtn close" onclick="ipc('close-window')">✕</button>
   </div>
 </div>
 
-<!-- Pages -->
-<div class="scroll" id="scroll">
+<div class="app" id="app">
 
-  <!-- SETUP PAGE -->
-  <div class="page active" id="page-setup">
-    <div class="setup-hero">
-      <div class="setup-icon">⚡</div>
-      <div class="setup-title">Bienvenue sur Nexus</div>
-      <div class="setup-sub">Contrôlez tous vos appareils Tuya / Smart Life depuis un seul endroit.</div>
-    </div>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar" style="display:none">
+    <button class="nav-item active" id="nav-home" onclick="showPage('home')" title="Accueil">🏠</button>
+    <button class="nav-item" id="nav-devices" onclick="showPage('devices')" title="Appareils">⚡</button>
+    <button class="nav-item" id="nav-config" onclick="showPage('config')" title="Réglages">⚙️</button>
+  </div>
 
-    <div class="step-card">
-      <div class="step-header">
-        <div class="step-num">1</div>
-        <div>
-          <div class="step-title">Créer un projet Tuya IoT</div>
-          <div class="step-sub">Gratuit — 2 minutes</div>
+  <!-- Main area -->
+  <div class="main-area">
+    <div class="scroll" id="scroll">
+
+      <!-- SETUP -->
+      <div class="page active" id="page-setup">
+        <div class="setup-wrap">
+          <div class="setup-hero">
+            <div class="setup-logo">⚡</div>
+            <div class="setup-title">Bienvenue sur Nexus</div>
+            <div class="setup-sub">Contrôlez tous vos appareils connectés depuis un seul endroit.</div>
+          </div>
+          <div class="step-card">
+            <div class="step-hd"><div class="step-num">1</div><div><div class="step-title">Créer un projet Tuya IoT</div><div class="step-sub">Gratuit — 2 minutes</div></div></div>
+            <p style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:8px">Allez sur <a class="link" href="#" onclick="shell('https://iot.tuya.com')">iot.tuya.com ↗</a>, créez un projet <strong style="color:var(--text)">Smart Home</strong> avec le Data Center <strong style="color:var(--text)">Central Europe</strong>.</p>
+            <p style="font-size:12px;color:var(--text-dim);line-height:1.6">Dans <strong style="color:var(--text)">Devices → Link App Account</strong>, liez votre compte Smart Life via QR code.</p>
+          </div>
+          <div class="step-card">
+            <div class="step-hd"><div class="step-num">2</div><div><div class="step-title">Clés API</div><div class="step-sub">Trouvées sur la page de votre projet</div></div></div>
+            <div class="field"><label>Client ID</label><input id="s-cid" type="text" placeholder="ex: 7ghm3r5ytan8u3ysnrxr"/></div>
+            <div class="field"><label>Client Secret</label><input id="s-secret" type="password" placeholder="••••••••••••••••"/></div>
+            <div class="field"><label>Région</label>
+              <select id="s-region">
+                <option value="eu">Central Europe (EU) — France</option>
+                <option value="us">Western America (US)</option>
+                <option value="in">India (IN)</option>
+                <option value="cn">China (CN)</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" onclick="setupSave()">Démarrer →</button>
+          </div>
         </div>
       </div>
-      <p style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:10px">
-        Rendez-vous sur <a class="link" href="#" onclick="shell('https://iot.tuya.com')">iot.tuya.com ↗</a>, créez un projet <strong style="color:var(--text)">Smart Home</strong> avec le Data Center <strong style="color:var(--text)">Central Europe</strong>, puis autorisez les API suggérées.
-      </p>
-      <p style="font-size:12px;color:var(--text-dim);line-height:1.6">
-        Ensuite, dans <strong style="color:var(--text)">Devices → Link App Account</strong>, liez votre compte Smart Life via QR code.
-      </p>
-    </div>
 
-    <div class="step-card">
-      <div class="step-header">
-        <div class="step-num">2</div>
-        <div>
-          <div class="step-title">Entrez vos clés API</div>
-          <div class="step-sub">Trouvées sur la page de votre projet</div>
+      <!-- HOME (Pièces) -->
+      <div class="page" id="page-home">
+        <div class="row page-header">
+          <div><div class="page-title">Ma maison</div><div class="page-sub" id="home-sub">Chargement…</div></div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-ghost btn-sm" onclick="importTuyaRooms()">↓ Importer</button>
+            <button class="btn btn-primary btn-sm" onclick="openAddRoom()">+ Pièce</button>
+          </div>
+        </div>
+        <div class="room-grid" id="room-grid"></div>
+        <div id="room-devices-section" style="display:none">
+          <div class="row" style="margin-bottom:8px">
+            <div class="section-label" id="room-devices-label">Appareils</div>
+            <button class="btn btn-ghost btn-sm" onclick="closeRoomDevices()">✕</button>
+          </div>
+          <div class="device-list" id="room-device-list"></div>
         </div>
       </div>
-      <div class="field">
-        <label>Client ID</label>
-        <input id="s-cid" type="text" placeholder="ex: 7ghm3r5ytan8u3ysnrxr"/>
+
+      <!-- ALL DEVICES -->
+      <div class="page" id="page-devices">
+        <div class="row page-header">
+          <div><div class="page-title">Appareils</div><div class="page-sub" id="devices-sub">Chargement…</div></div>
+          <button class="btn btn-ghost btn-sm" onclick="loadDevices()">🔄</button>
+        </div>
+        <div class="device-list" id="all-device-list">
+          <div class="empty"><div class="empty-icon">📡</div><div class="empty-text">Chargement…</div></div>
+        </div>
       </div>
-      <div class="field">
-        <label>Client Secret</label>
-        <input id="s-secret" type="password" placeholder="••••••••••••••••••••••••••••••••"/>
+
+      <!-- CONFIG -->
+      <div class="page" id="page-config">
+        <div class="page-title" style="margin-bottom:14px">Réglages</div>
+        <div class="cfg-section">
+          <div class="cfg-title">Connexion API</div>
+          <div class="field"><label>Client ID</label><input id="c-cid" type="text"/></div>
+          <div class="field"><label>Client Secret</label><input id="c-secret" type="password"/></div>
+          <div class="field"><label>Région</label>
+            <select id="c-region">
+              <option value="eu">Central Europe (EU)</option>
+              <option value="us">Western America (US)</option>
+              <option value="in">India (IN)</option>
+              <option value="cn">China (CN)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="configSave()">💾 Sauvegarder</button>
+        </div>
+        <div class="cfg-section">
+          <div class="cfg-title">Danger</div>
+          <button class="btn btn-danger" onclick="resetApp()">Réinitialiser Nexus</button>
+        </div>
       </div>
-      <div class="field">
-        <label>Région</label>
-        <select id="s-region">
-          <option value="eu">Central Europe (EU) — recommandé France</option>
-          <option value="us">Western America (US)</option>
-          <option value="in">India (IN)</option>
-          <option value="cn">China (CN)</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="setupSave()">Continuer →</button>
+
+    </div><!-- /scroll -->
+  </div><!-- /main-area -->
+</div><!-- /app -->
+
+<!-- Modal : Ajouter une pièce -->
+<div class="modal-overlay" id="modal-room">
+  <div class="modal">
+    <div class="modal-title">Nouvelle pièce</div>
+    <div class="field"><label>Nom</label><input id="room-name-input" type="text" placeholder="ex: Salon"/></div>
+    <div class="field"><label>Icône</label>
+      <div class="icon-grid" id="icon-grid"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-room')">Annuler</button>
+      <button class="btn btn-primary" onclick="confirmAddRoom()">Créer</button>
     </div>
   </div>
-
-  <!-- MAIN PAGE -->
-  <div class="page" id="page-main">
-    <div class="section-label">Mes appareils</div>
-    <div id="device-list">
-      <div class="empty">
-        <div class="empty-icon">📡</div>
-        <div class="empty-text">Chargement des appareils…</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- CONFIG PAGE -->
-  <div class="page" id="page-config">
-    <div class="cfg-section">
-      <div class="cfg-title">Connexion API</div>
-      <div class="field">
-        <label>Client ID</label>
-        <input id="c-cid" type="text"/>
-      </div>
-      <div class="field">
-        <label>Client Secret</label>
-        <input id="c-secret" type="password"/>
-      </div>
-      <div class="field">
-        <label>Région</label>
-        <select id="c-region">
-          <option value="eu">Central Europe (EU)</option>
-          <option value="us">Western America (US)</option>
-          <option value="in">India (IN)</option>
-          <option value="cn">China (CN)</option>
-        </select>
-      </div>
-      <button class="btn btn-primary" onclick="configSave()">💾 Sauvegarder</button>
-    </div>
-    <div class="cfg-section">
-      <div class="cfg-title">Appareils</div>
-      <button class="btn btn-ghost" onclick="loadDevices()">🔄 Rafraîchir les appareils</button>
-    </div>
-    <div class="cfg-section">
-      <div class="cfg-title">Danger</div>
-      <button class="btn btn-danger" onclick="resetApp()">Réinitialiser Nexus</button>
-    </div>
-  </div>
-
 </div>
 
-<!-- Nav (hidden until configured) -->
-<div class="nav" id="nav" style="display:none">
-  <button class="nav-btn active" id="nav-main" onclick="showPage('main')">
-    <span class="nav-icon">⚡</span>Appareils
-  </button>
-  <button class="nav-btn" id="nav-config" onclick="showPage('config')">
-    <span class="nav-icon">⚙️</span>Réglages
-  </button>
+<!-- Modal : Assigner appareil à une pièce -->
+<div class="modal-overlay" id="modal-assign">
+  <div class="modal">
+    <div class="modal-title" id="assign-title">Déplacer vers…</div>
+    <div id="assign-list" style="display:flex;flex-direction:column;gap:6px;max-height:280px;overflow-y:auto"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-assign')">Annuler</button>
+    </div>
+  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<script>
-const { ipcRenderer, shell: electronShell } = require('electron');
+<canvas id="colorWheel" width="110" height="110" style="display:none"></canvas>
 
-function ipc(ch, ...args) { return ipcRenderer.invoke(ch, ...args); }
-function shell(url) { electronShell.openExternal(url); }
+<script>
+const { ipcRenderer, shell: eShell } = require('electron');
+function ipc(ch,...a){ return ipcRenderer.invoke(ch,...a); }
+function shell(u){ eShell.openExternal(u); }
 
 // ── State ──────────────────────────────────────────────────────────────────
-let devices = [];
+let allDevices = [];
+let rooms = [];
 let devStates = {};
-let currentPage = 'setup';
+let expandedCards = new Set();
+let selectedRoomId = null;
+let selectedIcon = '🛋️';
+let assigningDeviceId = null;
+
+const ROOM_ICONS = ['🛋️','🛏️','🍳','🚿','🪴','💼','🎮','📚','🏋️','🌿','🚗','⭐'];
 
 // ── Init ───────────────────────────────────────────────────────────────────
 async function init() {
+  buildIconGrid();
   const configured = await ipc('is-configured');
   if (configured) {
-    showNav();
-    showPage('main');
-    loadDevices();
+    showApp();
+    rooms = await ipc('get-rooms');
+    await loadDevices();
+    renderHome();
   }
 }
 
-// ── Navigation ─────────────────────────────────────────────────────────────
-function showNav() {
-  document.getElementById('nav').style.display = 'flex';
-  document.getElementById('scroll').classList.add('has-nav');
+function showApp() {
+  document.getElementById('sidebar').style.display = 'flex';
+  showPage('home');
 }
 
+// ── Navigation ─────────────────────────────────────────────────────────────
 function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-' + name).classList.add('active');
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  const nb = document.getElementById('nav-' + name);
-  if (nb) nb.classList.add('active');
-  currentPage = name;
-
-  if (name === 'config') prefillConfig();
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const nb = document.getElementById('nav-'+name);
+  if(nb) nb.classList.add('active');
+  if (name==='config') prefillConfig();
+  if (name==='devices') renderAllDevices();
 }
 
 // ── Setup ──────────────────────────────────────────────────────────────────
@@ -475,258 +375,477 @@ async function setupSave() {
   const clientId = document.getElementById('s-cid').value.trim();
   const clientSecret = document.getElementById('s-secret').value.trim();
   const region = document.getElementById('s-region').value;
-  if (!clientId || !clientSecret) { toast('Renseignez les deux clés', 'err'); return; }
-  await ipc('save-config', { clientId, clientSecret, region });
-  showNav();
-  showPage('main');
-  loadDevices();
-  toast('Configuration sauvegardée ✓', 'ok');
+  if (!clientId||!clientSecret){ toast('Renseignez les deux clés','err'); return; }
+  await ipc('save-config',{clientId,clientSecret,region});
+  showApp();
+  await loadDevices();
+  renderHome();
+  toast('Connecté ✓','ok');
 }
 
 // ── Config ─────────────────────────────────────────────────────────────────
 async function prefillConfig() {
   const cfg = await ipc('get-config');
-  document.getElementById('c-cid').value = cfg.clientId || '';
-  document.getElementById('c-secret').value = cfg.clientSecret || '';
-  document.getElementById('c-region').value = cfg.region || 'eu';
+  document.getElementById('c-cid').value = cfg.clientId||'';
+  document.getElementById('c-secret').value = cfg.clientSecret||'';
+  document.getElementById('c-region').value = cfg.region||'eu';
 }
-
 async function configSave() {
-  const clientId = document.getElementById('c-cid').value.trim();
-  const clientSecret = document.getElementById('c-secret').value.trim();
-  const region = document.getElementById('c-region').value;
-  await ipc('save-config', { clientId, clientSecret, region });
-  toast('Sauvegardé ✓', 'ok');
-  loadDevices();
+  await ipc('save-config',{
+    clientId: document.getElementById('c-cid').value.trim(),
+    clientSecret: document.getElementById('c-secret').value.trim(),
+    region: document.getElementById('c-region').value
+  });
+  toast('Sauvegardé ✓','ok');
+  await loadDevices();
 }
-
 function resetApp() {
-  if (!confirm('Réinitialiser Nexus ? Votre configuration sera effacée.')) return;
-  ipc('save-config', { clientId: '', clientSecret: '', region: 'eu' });
+  if(!confirm('Réinitialiser Nexus ?')) return;
+  ipc('save-config',{clientId:'',clientSecret:'',region:'eu'});
+  ipc('save-rooms',[]);
   location.reload();
 }
 
-// ── Devices ────────────────────────────────────────────────────────────────
+// ── Load devices ───────────────────────────────────────────────────────────
 async function loadDevices() {
-  const list = document.getElementById('device-list');
-  list.innerHTML = `<div class="empty"><div class="empty-icon">📡</div><div class="empty-text">Chargement…</div></div>`;
   const res = await ipc('get-devices');
-  if (!res.success) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${res.msg || 'Erreur de connexion'}</div><button class="btn btn-ghost" style="margin-top:10px;width:auto;padding:8px 16px" onclick="loadDevices()">Réessayer</button></div>`;
-    return;
-  }
-  devices = res.result?.devices || res.result?.list || [];
-  if (!devices.length) {
-    list.innerHTML = `<div class="empty"><div class="empty-icon">🔌</div><div class="empty-text">Aucun appareil trouvé.<br>Vérifiez que vos appareils sont liés sur iot.tuya.com</div></div>`;
-    return;
-  }
-  list.innerHTML = '';
-  for (const d of devices) {
-    const statusRes = await ipc('get-device-status', d.id);
+  if (!res.success){ toast(res.msg||'Erreur API','err'); return; }
+  allDevices = res.result?.devices || [];
+  // fetch statuses
+  for (const d of allDevices) {
+    const sr = await ipc('get-device-status', d.id);
     const dps = {};
-    if (statusRes.success) statusRes.result?.forEach(s => { dps[s.code] = s.value; });
+    if (sr.success) sr.result?.forEach(s=>{ dps[s.code]=s.value; });
     devStates[d.id] = dps;
-    list.appendChild(buildCard(d, dps));
   }
+  document.getElementById('devices-sub').textContent = `${allDevices.length} appareil${allDevices.length>1?'s':''}`;
 }
 
-function buildCard(d, dps) {
-  const cat = d._category || d.category;
-  const isLight = cat === 'light';
-  const isSwitch = cat === 'switch';
+// ── Home / Rooms ───────────────────────────────────────────────────────────
+function renderHome() {
+  const grid = document.getElementById('room-grid');
+  grid.innerHTML = '';
+  rooms.forEach(room => {
+    const count = (room.deviceIds||[]).length;
+    const card = document.createElement('div');
+    card.className = `room-card${selectedRoomId===room.id?' active-room':''}`;
+    card.innerHTML = `
+      <div class="room-icon">${room.icon||'🏠'}</div>
+      <div class="room-name">${room.name}</div>
+      <div class="room-count">${count} appareil${count!==1?'s':''}</div>
+    `;
+    card.onclick = () => selectRoom(room.id);
+    grid.appendChild(card);
+  });
+  // Add button
+  const add = document.createElement('div');
+  add.className = 'room-card room-add';
+  add.innerHTML = `<div class="room-add-icon">+</div><div class="room-add-label">Nouvelle pièce</div>`;
+  add.onclick = openAddRoom;
+  grid.appendChild(add);
+
+  const sub = document.getElementById('home-sub');
+  sub.textContent = `${rooms.length} pièce${rooms.length!==1?'s':''} · ${allDevices.length} appareil${allDevices.length!==1?'s':''}`;
+}
+
+function selectRoom(id) {
+  selectedRoomId = id;
+  renderHome();
+  const room = rooms.find(r=>r.id===id);
+  if (!room) return;
+  const section = document.getElementById('room-devices-section');
+  section.style.display = '';
+  document.getElementById('room-devices-label').textContent = room.name;
+  const list = document.getElementById('room-device-list');
+  list.innerHTML = '';
+  const devIds = room.deviceIds||[];
+  const roomDevs = allDevices.filter(d=>devIds.includes(d.id));
+  if (!roomDevs.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🔌</div><div class="empty-text">Aucun appareil dans cette pièce.<br>Assignez des appareils depuis la vue Appareils.</div></div>`;
+    return;
+  }
+  roomDevs.forEach(d => list.appendChild(buildDeviceCard(d)));
+}
+
+function closeRoomDevices() {
+  selectedRoomId = null;
+  document.getElementById('room-devices-section').style.display = 'none';
+  renderHome();
+}
+
+// ── Import Tuya rooms ──────────────────────────────────────────────────────
+async function importTuyaRooms() {
+  toast('Import en cours…');
+  const homesRes = await ipc('get-tuya-homes');
+  if (!homesRes.success || !homesRes.result?.length) {
+    toast('Aucune maison Tuya trouvée','err'); return;
+  }
+  const home = homesRes.result[0];
+  const roomsRes = await ipc('get-tuya-rooms', home.home_id||home.id);
+  if (!roomsRes.success) { toast('Erreur import pièces','err'); return; }
+  const tuyaRooms = roomsRes.result||[];
+  let added = 0;
+  for (const tr of tuyaRooms) {
+    const exists = rooms.find(r=>r.name.toLowerCase()===tr.name.toLowerCase());
+    if (!exists) {
+      rooms.push({ id: 'room_'+Date.now()+'_'+Math.random().toString(36).slice(2), name:tr.name, icon:'🏠', deviceIds:[] });
+      added++;
+    }
+  }
+  await ipc('save-rooms', rooms);
+  renderHome();
+  toast(`${added} pièce${added!==1?'s':''} importée${added!==1?'s':''}`, added?'ok':'');
+}
+
+// ── Add room modal ─────────────────────────────────────────────────────────
+function buildIconGrid() {
+  const grid = document.getElementById('icon-grid');
+  grid.innerHTML = '';
+  ROOM_ICONS.forEach(ic => {
+    const btn = document.createElement('div');
+    btn.className = `icon-opt${ic===selectedIcon?' selected':''}`;
+    btn.textContent = ic;
+    btn.onclick = () => { selectedIcon=ic; document.querySelectorAll('.icon-opt').forEach(b=>b.classList.remove('selected')); btn.classList.add('selected'); };
+    grid.appendChild(btn);
+  });
+}
+function openAddRoom() {
+  document.getElementById('room-name-input').value = '';
+  selectedIcon = ROOM_ICONS[0];
+  buildIconGrid();
+  document.getElementById('modal-room').classList.add('open');
+}
+async function confirmAddRoom() {
+  const name = document.getElementById('room-name-input').value.trim();
+  if (!name){ toast('Entrez un nom','err'); return; }
+  rooms.push({ id:'room_'+Date.now(), name, icon:selectedIcon, deviceIds:[] });
+  await ipc('save-rooms', rooms);
+  closeModal('modal-room');
+  renderHome();
+  toast('Pièce créée ✓','ok');
+}
+
+// ── Assign device to room ──────────────────────────────────────────────────
+function openAssign(deviceId) {
+  assigningDeviceId = deviceId;
+  document.getElementById('assign-title').textContent = 'Déplacer vers…';
+  const list = document.getElementById('assign-list');
+  list.innerHTML = '';
+  rooms.forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-ghost';
+    btn.style = 'justify-content:flex-start;gap:10px;padding:10px 14px';
+    btn.innerHTML = `<span>${r.icon}</span><span>${r.name}</span>`;
+    btn.onclick = () => assignToRoom(deviceId, r.id);
+    list.appendChild(btn);
+  });
+  if (!rooms.length) list.innerHTML = `<div class="empty"><div class="empty-text">Créez d'abord une pièce</div></div>`;
+  document.getElementById('modal-assign').classList.add('open');
+}
+async function assignToRoom(deviceId, roomId) {
+  rooms.forEach(r => { r.deviceIds = (r.deviceIds||[]).filter(id=>id!==deviceId); });
+  const room = rooms.find(r=>r.id===roomId);
+  if (room) { room.deviceIds = room.deviceIds||[]; room.deviceIds.push(deviceId); }
+  await ipc('save-rooms', rooms);
+  closeModal('modal-assign');
+  renderHome();
+  renderAllDevices();
+  toast(`Assigné à ${room?.name} ✓`,'ok');
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+// ── Render all devices ─────────────────────────────────────────────────────
+function renderAllDevices() {
+  const list = document.getElementById('all-device-list');
+  list.innerHTML = '';
+  if (!allDevices.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">📡</div><div class="empty-text">Aucun appareil trouvé</div></div>`;
+    return;
+  }
+  allDevices.forEach(d => list.appendChild(buildDeviceCard(d)));
+}
+
+// ── Build device card ──────────────────────────────────────────────────────
+function buildDeviceCard(d) {
+  const cat = d._category||detectCat(d);
+  const isLight = cat==='light', isSwitch = cat==='switch';
+  const dps = devStates[d.id]||{};
   const isOn = dps.switch_led ?? dps.switch_1 ?? dps.switch ?? false;
-  const mode = dps.work_mode || 'white';
-
-  const card = document.createElement('div');
-  card.className = `device-card${isOn ? ' on' : ''}`;
-  card.id = `dc-${d.id}`;
-
   const icon = isLight ? '💡' : isSwitch ? '🔌' : '📟';
-  const typeLabel = isLight ? 'Ampoule' : isSwitch ? 'Prise connectée' : 'Appareil';
-
-  let controls = '';
-
-  if (isLight) {
-    const bright = dps.bright_value_v2 || 500;
-    const temp = dps.temp_value_v2 || 500;
-    const h = dps.colour_data_v2?.h || 0;
-    const s = Math.round((dps.colour_data_v2?.s || 0) / 10);
-    const v = Math.round((dps.colour_data_v2?.v || 500) / 10);
-    const hexColor = hsvToHex(h, s / 100, v / 100);
-
-    controls = `
-    <div class="light-controls" id="lc-${d.id}">
-      <div class="mode-row">
-        <div class="mode-btn${mode === 'white' ? ' active' : ''}" onclick="setMode('${d.id}','white')">☀ Blanc</div>
-        <div class="mode-btn${mode === 'colour' ? ' active' : ''}" onclick="setMode('${d.id}','colour')">🎨 Couleur</div>
-      </div>
-      <div id="white-${d.id}" style="${mode !== 'white' ? 'display:none' : ''}">
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Luminosité</span><span id="bv-${d.id}">${bright}</span></div>
-          <input type="range" min="10" max="1000" value="${bright}"
-            oninput="document.getElementById('bv-${d.id}').textContent=this.value"
-            onchange="sendCmd('${d.id}',[{code:'work_mode',value:'white'},{code:'bright_value_v2',value:+this.value}])">
-        </div>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Température</span><span id="tv-${d.id}">${temp <= 500 ? 'Chaud' : 'Froid'}</span></div>
-          <input type="range" min="0" max="1000" value="${temp}"
-            oninput="document.getElementById('tv-${d.id}').textContent=+this.value<=500?'Chaud':'Froid'"
-            onchange="sendCmd('${d.id}',[{code:'work_mode',value:'white'},{code:'temp_value_v2',value:+this.value}])">
-        </div>
-      </div>
-      <div id="colour-${d.id}" style="${mode !== 'colour' ? 'display:none' : ''}">
-        <div class="color-row">
-          <div class="color-swatch" id="swatch-${d.id}" style="background:${hexColor}" onclick="document.getElementById('cp-${d.id}').click()"></div>
-          <input type="color" id="cp-${d.id}" value="${hexColor}" oninput="onColorChange('${d.id}',this.value)">
-          <div class="color-hint">Choisir une couleur</div>
-        </div>
-        <div class="ctrl-group">
-          <div class="ctrl-label"><span>Intensité</span><span id="cv-${d.id}">${v * 10}</span></div>
-          <input type="range" min="0" max="1000" value="${v * 10}"
-            oninput="document.getElementById('cv-${d.id}').textContent=this.value"
-            onchange="applyColor('${d.id}',null,null,+this.value)">
-        </div>
-      </div>
-    </div>`;
-  }
-
-  if (isSwitch) {
-    const cur = dps.cur_power != null ? (dps.cur_power / 10).toFixed(1) + ' W' : '—';
-    const volt = dps.cur_voltage != null ? (dps.cur_voltage / 10).toFixed(0) + ' V' : '—';
-    controls = `
-    <div class="switch-controls">
-      <div style="display:flex;gap:8px">
-        <div class="switch-info" style="flex:1">
-          <div class="switch-info-icon">⚡</div>
-          <div><div class="switch-info-text">Puissance</div><div class="switch-info-val" id="sw-pow-${d.id}">${cur}</div></div>
-        </div>
-        <div class="switch-info" style="flex:1">
-          <div class="switch-info-icon">🔋</div>
-          <div><div class="switch-info-text">Tension</div><div class="switch-info-val" id="sw-vol-${d.id}">${volt}</div></div>
-        </div>
-      </div>
-    </div>`;
-  }
-
+  const typeLabel = isLight ? 'Ampoule' : isSwitch ? 'Prise' : 'Appareil';
+  const room = rooms.find(r=>(r.deviceIds||[]).includes(d.id));
   const toggleCode = isLight ? 'switch_led' : 'switch_1';
 
+  const card = document.createElement('div');
+  card.className = `device-card${isOn?' on':''}${expandedCards.has(d.id)?' expanded':''}`;
+  card.id = `dc-${d.id}`;
+
+  const statusSpan = isOn
+    ? `<span style="color:var(--on)">Allumé</span>`
+    : `<span style="color:var(--text-muted)">Éteint</span>`;
+
   card.innerHTML = `
-    <div class="dc-top">
+    <div class="dc-main" onclick="toggleExpand('${d.id}')">
+      <div class="dc-icon">${icon}</div>
       <div class="dc-info">
-        <div class="dc-icon">${icon}</div>
-        <div>
-          <div class="dc-name">${d.name || 'Appareil'}</div>
-          <div class="dc-type">${typeLabel} · ${isOn ? '<span style="color:var(--on)">Allumé</span>' : '<span style="color:var(--text-muted)">Éteint</span>'}</div>
-        </div>
+        <div class="dc-name">${d.name||'Appareil'}</div>
+        <div class="dc-meta">${typeLabel}${room?' · '+room.name:''} · ${statusSpan}</div>
       </div>
-      <label class="toggle">
-        <input type="checkbox" ${isOn ? 'checked' : ''} onchange="toggleDevice('${d.id}','${toggleCode}',this.checked)" id="tog-${d.id}">
-        <div class="t-track"></div>
-        <div class="t-thumb"></div>
+      <span class="dc-expand">▾</span>
+      <label class="toggle" onclick="event.stopPropagation()">
+        <input type="checkbox" ${isOn?'checked':''} id="tog-${d.id}" onchange="toggleDevice('${d.id}','${toggleCode}',this.checked)">
+        <div class="t-track"></div><div class="t-thumb"></div>
       </label>
     </div>
-    ${isOn ? controls : `<div id="hidden-controls-${d.id}" style="display:none">${controls}</div>`}
+    <div class="ctrl-panel" id="ctrl-${d.id}" style="display:${expandedCards.has(d.id)?'block':'none'}">
+      ${isLight ? buildLightControls(d, dps) : ''}
+      ${isSwitch ? buildSwitchControls(dps) : ''}
+      <div style="margin-top:10px">
+        <button class="btn btn-ghost btn-sm" onclick="openAssign('${d.id}')">📍 Assigner à une pièce</button>
+      </div>
+    </div>
   `;
 
-  if (!isOn) {
-    // store controls for when turned on
-    card._controls = controls;
+  if (isLight) {
+    setTimeout(() => initColorWheel(d.id, dps), 50);
   }
 
   return card;
 }
 
-// ── Device Controls ────────────────────────────────────────────────────────
-async function toggleDevice(id, code, on) {
-  const res = await sendCmd(id, [{ code, value: on }]);
-  if (res && res.success) {
-    const card = document.getElementById(`dc-${id}`);
-    if (!card) return;
-    card.classList.toggle('on', on);
-    // Update type text
-    const typeEl = card.querySelector('.dc-type');
-    const d = devices.find(x => x.id === id);
-    const typeLabel = d?._category === 'light' ? 'Ampoule' : d?._category === 'switch' ? 'Prise connectée' : 'Appareil';
-    if (typeEl) typeEl.innerHTML = `${typeLabel} · ${on ? '<span style="color:var(--on)">Allumé</span>' : '<span style="color:var(--text-muted)">Éteint</span>'}`;
-    toast(on ? '✓ Allumé' : '✓ Éteint', 'ok');
+function detectCat(d) {
+  const c=(d.category||'').toLowerCase();
+  if(['dj','dd','xdd','fwd','dc','jsq'].includes(c)) return 'light';
+  if(['cz','pc','kg'].includes(c)) return 'switch';
+  return 'generic';
+}
+
+function toggleExpand(id) {
+  const ctrl = document.getElementById(`ctrl-${id}`);
+  const card = document.getElementById(`dc-${id}`);
+  if (!ctrl||!card) return;
+  if (expandedCards.has(id)) {
+    expandedCards.delete(id);
+    ctrl.style.display = 'none';
+    card.classList.remove('expanded');
   } else {
-    document.getElementById(`tog-${id}`).checked = !on;
-    toast('Erreur de connexion', 'err');
+    expandedCards.add(id);
+    ctrl.style.display = 'block';
+    card.classList.add('expanded');
+    const d = allDevices.find(x=>x.id===id);
+    if (d && (d._category||detectCat(d))==='light') {
+      setTimeout(() => initColorWheel(id, devStates[id]||{}), 80);
+    }
+  }
+}
+
+// ── Light controls ─────────────────────────────────────────────────────────
+function buildLightControls(d, dps) {
+  const mode = dps.work_mode||'white';
+  const bright = dps.bright_value_v2||500;
+  const temp = dps.temp_value_v2||500;
+  const h = dps.colour_data_v2?.h||0;
+  const s = dps.colour_data_v2?.s||0;
+  const v = dps.colour_data_v2?.v||500;
+
+  return `
+  <div class="mode-tabs">
+    <div class="mode-tab${mode==='white'?' active':''}" onclick="setMode('${d.id}','white')">☀ Blanc</div>
+    <div class="mode-tab${mode==='colour'?' active':''}" onclick="setMode('${d.id}','colour')">🎨 Couleur</div>
+  </div>
+
+  <div id="white-${d.id}" style="${mode!=='white'?'display:none':''}">
+    <div class="slider-group">
+      <div class="slider-label"><span>☀ Luminosité</span><span id="bv-${d.id}">${bright}</span></div>
+      <input type="range" min="10" max="1000" value="${bright}"
+        oninput="document.getElementById('bv-${d.id}').textContent=this.value"
+        onchange="sendCmd('${d.id}',[{code:'work_mode',value:'white'},{code:'bright_value_v2',value:+this.value}])">
+    </div>
+    <div class="slider-group temp-track">
+      <div class="slider-label"><span>🌡 Chaleur</span><span id="tv-${d.id}">${temp<=333?'Chaud':temp>=666?'Froid':'Neutre'}</span></div>
+      <input type="range" min="0" max="1000" value="${temp}"
+        oninput="updateTempLabel('${d.id}',this.value)"
+        onchange="sendCmd('${d.id}',[{code:'work_mode',value:'white'},{code:'temp_value_v2',value:+this.value}])">
+    </div>
+  </div>
+
+  <div id="colour-${d.id}" style="${mode!=='colour'?'display:none':''}">
+    <div class="color-section">
+      <div class="wheel-wrap" id="wrap-${d.id}">
+        <canvas id="wheel-${d.id}" width="110" height="110" style="border-radius:50%;cursor:crosshair;display:block"></canvas>
+        <div class="wheel-cursor" id="cur-${d.id}"></div>
+      </div>
+      <div class="color-sliders">
+        <div class="slider-group">
+          <div class="slider-label"><span>✨ Intensité</span><span id="cv-${d.id}">${Math.round(v/10)}%</span></div>
+          <input type="range" min="0" max="1000" value="${v}" id="vs-${d.id}"
+            oninput="document.getElementById('cv-${d.id}').textContent=Math.round(this.value/10)+'%';applyColor('${d.id}')"
+            onchange="applyColor('${d.id}')">
+        </div>
+        <div class="slider-group">
+          <div class="slider-label"><span>💧 Saturation</span><span id="sv-${d.id}">${Math.round(s/10)}%</span></div>
+          <input type="range" min="0" max="1000" value="${s}" id="ss-${d.id}"
+            oninput="document.getElementById('sv-${d.id}').textContent=Math.round(this.value/10)+'%';applyColor('${d.id}')"
+            onchange="applyColor('${d.id}')">
+        </div>
+      </div>
+    </div>
+    <div class="color-preview-strip" id="preview-${d.id}"></div>
+  </div>`;
+}
+
+// ── Color wheel ────────────────────────────────────────────────────────────
+const wheelState = {}; // { deviceId: { h, s, v, dragging } }
+
+function initColorWheel(id, dps) {
+  const canvas = document.getElementById(`wheel-${id}`);
+  if (!canvas) return;
+  const h = dps.colour_data_v2?.h||0;
+  const s = dps.colour_data_v2?.s||0;
+  const v = dps.colour_data_v2?.v||500;
+  wheelState[id] = { h, s, v, dragging:false };
+  drawWheel(canvas);
+  updateCursor(id, h, s/1000);
+  updatePreview(id, h, s, v);
+
+  canvas.onmousedown = e => { wheelState[id].dragging=true; handleWheelClick(id,canvas,e); };
+  canvas.onmousemove = e => { if(wheelState[id]?.dragging) handleWheelClick(id,canvas,e); };
+  canvas.onmouseup   = e => { wheelState[id].dragging=false; applyColor(id); };
+  canvas.onmouseleave = e => { if(wheelState[id]?.dragging){ wheelState[id].dragging=false; applyColor(id); }};
+}
+
+function drawWheel(canvas) {
+  const ctx = canvas.getContext('2d');
+  const cx=canvas.width/2, cy=canvas.height/2, r=cx;
+  for (let angle=0; angle<360; angle++) {
+    const startAngle = (angle-1)*Math.PI/180, endAngle = (angle+1)*Math.PI/180;
+    const grad = ctx.createRadialGradient(cx,cy,0,cx,cy,r);
+    grad.addColorStop(0,'#fff');
+    grad.addColorStop(1,`hsl(${angle},100%,50%)`);
+    ctx.beginPath(); ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,startAngle,endAngle);
+    ctx.closePath(); ctx.fillStyle=grad; ctx.fill();
+  }
+}
+
+function handleWheelClick(id, canvas, e) {
+  const rect = canvas.getBoundingClientRect();
+  const x=e.clientX-rect.left, y=e.clientY-rect.top;
+  const cx=canvas.width/2, cy=canvas.height/2;
+  const dx=x-cx, dy=y-cy, dist=Math.sqrt(dx*dx+dy*dy), r=cx;
+  const normDist = Math.min(dist/r, 1);
+  let angle = Math.atan2(dy,dx)*180/Math.PI; if(angle<0)angle+=360;
+  const h = Math.round(angle), s = Math.round(normDist*1000);
+  if (!wheelState[id]) return;
+  wheelState[id].h=h; wheelState[id].s=s;
+  updateCursor(id, h, normDist);
+  const vSlider = document.getElementById(`vs-${id}`);
+  const sSlider = document.getElementById(`ss-${id}`);
+  if (sSlider) { sSlider.value=s; document.getElementById(`sv-${id}`).textContent=Math.round(s/10)+'%'; }
+  const v = vSlider ? parseInt(vSlider.value) : 500;
+  updatePreview(id, h, s, v);
+}
+
+function updateCursor(id, h, normS) {
+  const wrap = document.getElementById(`wrap-${id}`);
+  const cur  = document.getElementById(`cur-${id}`);
+  if (!wrap||!cur) return;
+  const r = wrap.offsetWidth/2||55;
+  const angle = h*Math.PI/180;
+  const dist = normS*r;
+  cur.style.left = (r + dist*Math.cos(angle))+'px';
+  cur.style.top  = (r + dist*Math.sin(angle))+'px';
+  cur.style.background = `hsl(${h},${Math.round(normS*100)}%,50%)`;
+}
+
+function updatePreview(id, h, s, v) {
+  const el = document.getElementById(`preview-${id}`);
+  if (!el) return;
+  const l = Math.round(25 + (v/1000)*40);
+  el.style.background = `hsl(${h},${Math.round(s/10)}%,${l}%)`;
+}
+
+function applyColor(id) {
+  const ws = wheelState[id];
+  const vSlider = document.getElementById(`vs-${id}`);
+  if (!ws) return;
+  const v = vSlider ? parseInt(vSlider.value) : 500;
+  ws.v = v;
+  updatePreview(id, ws.h, ws.s, v);
+  sendCmd(id, [
+    { code:'work_mode', value:'colour' },
+    { code:'colour_data_v2', value:{ h:ws.h, s:ws.s, v } }
+  ]);
+}
+
+// ── Switch controls ────────────────────────────────────────────────────────
+function buildSwitchControls(dps) {
+  const cur  = dps.cur_power   != null ? (dps.cur_power/10).toFixed(1)+' W' : '—';
+  const volt = dps.cur_voltage != null ? (dps.cur_voltage/10).toFixed(0)+' V' : '—';
+  const amp  = dps.cur_current != null ? (dps.cur_current/1000).toFixed(2)+' A' : '—';
+  return `
+  <div class="switch-stats">
+    <div class="stat-box"><div class="stat-icon">⚡</div><div class="stat-label">Puissance</div><div class="stat-val">${cur}</div></div>
+    <div class="stat-box"><div class="stat-icon">🔋</div><div class="stat-label">Tension</div><div class="stat-val">${volt}</div></div>
+    <div class="stat-box"><div class="stat-icon">〰️</div><div class="stat-label">Courant</div><div class="stat-val">${amp}</div></div>
+  </div>`;
+}
+
+// ── Device actions ─────────────────────────────────────────────────────────
+async function toggleDevice(id, code, on) {
+  const res = await sendCmd(id,[{code,value:on}]);
+  if (res?.success) {
+    if (!devStates[id]) devStates[id]={};
+    devStates[id][code]=on;
+    const card = document.getElementById(`dc-${id}`);
+    if (card) {
+      card.classList.toggle('on',on);
+      const meta = card.querySelector('.dc-meta');
+      if (meta) {
+        const d=allDevices.find(x=>x.id===id);
+        const cat=d?._category||detectCat(d||{});
+        const typeLabel=cat==='light'?'Ampoule':cat==='switch'?'Prise':'Appareil';
+        const room=rooms.find(r=>(r.deviceIds||[]).includes(id));
+        meta.innerHTML=`${typeLabel}${room?' · '+room.name:''} · ${on?'<span style="color:var(--on)">Allumé</span>':'<span style="color:var(--text-muted)">Éteint</span>'}`;
+      }
+    }
+    toast(on?'✓ Allumé':'✓ Éteint','ok');
+  } else {
+    const tog=document.getElementById(`tog-${id}`);
+    if(tog) tog.checked=!on;
+    toast(res?.msg||'Erreur','err');
   }
 }
 
 function setMode(id, mode) {
-  document.getElementById(`white-${id}`).style.display = mode === 'white' ? '' : 'none';
-  document.getElementById(`colour-${id}`).style.display = mode === 'colour' ? '' : 'none';
-  document.querySelectorAll(`#lc-${id} .mode-btn`).forEach((b, i) => {
-    b.classList.toggle('active', (i === 0 && mode === 'white') || (i === 1 && mode === 'colour'));
+  document.getElementById(`white-${id}`).style.display  = mode==='white'?'':'none';
+  document.getElementById(`colour-${id}`).style.display = mode==='colour'?'':'none';
+  document.querySelectorAll(`#dc-${id} .mode-tab`).forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&mode==='white')||(i===1&&mode==='colour'));
   });
-}
-
-let colorTimers = {};
-function onColorChange(id, hex) {
-  document.getElementById(`swatch-${id}`).style.background = hex;
-  clearTimeout(colorTimers[id]);
-  colorTimers[id] = setTimeout(() => {
-    const [h, s, v] = hexToHSV(hex);
-    const vSlider = document.getElementById(`cv-${id}`);
-    const vVal = vSlider ? parseInt(vSlider.value) : 1000;
-    sendCmd(id, [
-      { code: 'work_mode', value: 'colour' },
-      { code: 'colour_data_v2', value: { h, s: Math.round(s * 1000), v: vVal } }
-    ]);
-  }, 200);
-}
-
-function applyColor(id, h, s, v) {
-  const picker = document.getElementById(`cp-${id}`);
-  if (picker && (h === null)) {
-    const [ph, ps] = hexToHSV(picker.value);
-    h = ph; s = Math.round(ps * 1000);
+  if (mode==='colour') {
+    const d=allDevices.find(x=>x.id===id);
+    setTimeout(()=>initColorWheel(id,devStates[id]||{}),80);
   }
-  sendCmd(id, [
-    { code: 'work_mode', value: 'colour' },
-    { code: 'colour_data_v2', value: { h, s, v } }
-  ]);
+}
+
+function updateTempLabel(id, v) {
+  const el=document.getElementById(`tv-${id}`);
+  if(el) el.textContent=+v<=333?'Chaud':+v>=666?'Froid':'Neutre';
 }
 
 async function sendCmd(id, commands) {
-  const res = await ipc('send-command', id, commands);
-  if (!res.success) toast(res.msg || 'Erreur', 'err');
+  const res = await ipc('send-command',id,commands);
+  if (!res.success) toast(res.msg||'Erreur','err');
   return res;
 }
 
-// ── Utils ──────────────────────────────────────────────────────────────────
-function hexToHSV(hex) {
-  let r = parseInt(hex.slice(1,3),16)/255;
-  let g = parseInt(hex.slice(3,5),16)/255;
-  let b = parseInt(hex.slice(5,7),16)/255;
-  const max = Math.max(r,g,b), min = Math.min(r,g,b), d = max - min;
-  let h = 0, s = max ? d/max : 0, v = max;
-  if (d) {
-    if (max===r) h = ((g-b)/d)%6;
-    else if (max===g) h = (b-r)/d+2;
-    else h = (r-g)/d+4;
-    h = Math.round(h*60); if (h<0) h+=360;
-  }
-  return [h, s, v];
-}
-
-function hsvToHex(h, s, v) {
-  let r, g, b;
-  const i = Math.floor(h / 60) % 6;
-  const f = h / 60 - Math.floor(h / 60);
-  const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
-  [r,g,b] = [[v,t,p],[q,v,p],[p,v,t],[p,q,v],[t,p,v],[v,p,q]][i];
-  return '#' + [r,g,b].map(x => Math.round(x*255).toString(16).padStart(2,'0')).join('');
-}
-
-function toast(msg, type = '') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = `toast ${type} show`;
-  clearTimeout(t._timer);
-  t._timer = setTimeout(() => t.className = 'toast', 2500);
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className=`toast ${type} show`;
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',2500);
 }
 
 init();
