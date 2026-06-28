@@ -1,502 +1,702 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8"/>
-  <title>Nexus</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8"/>
+<title>Nexus</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
 
-    :root {
-      --bg: #0f0f13;
-      --surface: #1a1a22;
-      --surface2: #22222e;
-      --border: #2e2e3e;
-      --accent: #7c6af7;
-      --accent2: #a78bfa;
-      --text: #e8e8f0;
-      --text-dim: #6b6b80;
-      --on: #4ade80;
-      --off: #ef4444;
-      --radius: 14px;
-    }
+:root{
+  --bg:#0c0c10;
+  --s1:#13131a;
+  --s2:#1a1a24;
+  --s3:#22222e;
+  --border:#2a2a38;
+  --border2:#333344;
+  --accent:#6c63f5;
+  --accent-dim:#4a4580;
+  --accent-glow:rgba(108,99,245,0.18);
+  --text:#ddddf0;
+  --text-dim:#6b6b88;
+  --text-muted:#44445a;
+  --on:#3dd68c;
+  --off:#f04747;
+  --r:12px;
+  --r-sm:8px;
+}
 
-    body {
-      font-family: -apple-system, 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      height: 100vh;
-      overflow: hidden;
-      user-select: none;
-    }
+body{
+  font-family:'Segoe UI',system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  height:100vh;
+  overflow:hidden;
+  user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
 
-    /* Titlebar */
-    .titlebar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 18px;
-      -webkit-app-region: drag;
-      background: var(--bg);
-      border-bottom: 1px solid var(--border);
-    }
-    .titlebar-left { display: flex; align-items: center; gap: 10px; }
-    .titlebar-icon { font-size: 20px; }
-    .titlebar-title { font-size: 15px; font-weight: 700; letter-spacing: 0.5px; color: var(--accent2); }
-    .titlebar-controls { display: flex; gap: 8px; -webkit-app-region: no-drag; }
-    .btn-win {
-      width: 28px; height: 28px; border-radius: 8px; border: none;
-      cursor: pointer; font-size: 13px; display: flex; align-items: center;
-      justify-content: center; transition: background 0.15s;
-      background: var(--surface2); color: var(--text-dim);
-    }
-    .btn-win:hover { background: var(--border); color: var(--text); }
-    .btn-win.close:hover { background: #ef4444; color: #fff; }
+/* ── Titlebar ── */
+.titlebar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px;
+  -webkit-app-region:drag;
+  border-bottom:1px solid var(--border);
+  background:var(--bg);
+}
+.tb-left{display:flex;align-items:center;gap:9px}
+.tb-logo{
+  width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,var(--accent),#9c6af5);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.tb-name{font-size:14px;font-weight:700;letter-spacing:.3px;color:var(--text)}
+.tb-tag{font-size:10px;color:var(--text-dim);margin-top:1px}
+.tb-controls{display:flex;gap:6px;-webkit-app-region:no-drag}
+.wbtn{
+  width:26px;height:26px;border-radius:7px;border:none;
+  background:var(--s3);color:var(--text-dim);cursor:pointer;
+  font-size:12px;display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.wbtn:hover{background:var(--border2);color:var(--text)}
+.wbtn.close:hover{background:var(--off);color:#fff}
 
-    /* Main scroll */
-    .main { height: calc(100vh - 57px); overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 14px; }
-    .main::-webkit-scrollbar { width: 4px; }
-    .main::-webkit-scrollbar-track { background: transparent; }
-    .main::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+/* ── Scroll area ── */
+.scroll{
+  height:calc(100vh - 53px);
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:16px;
+  display:flex;flex-direction:column;gap:12px;
+}
+.scroll::-webkit-scrollbar{width:3px}
+.scroll::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
 
-    /* Section title */
-    .section-title {
-      font-size: 11px; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 1.2px; color: var(--text-dim); margin-bottom: 2px;
-    }
+/* ── Pages ── */
+.page{display:none;flex-direction:column;gap:12px}
+.page.active{display:flex}
 
-    /* Device card */
-    .device-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      transition: border-color 0.2s;
-    }
-    .device-card.active { border-color: var(--accent); }
+/* ── Setup page ── */
+.setup-hero{
+  background:linear-gradient(135deg,var(--s2),var(--s1));
+  border:1px solid var(--border);
+  border-radius:var(--r);
+  padding:24px 20px;
+  text-align:center;
+}
+.setup-icon{font-size:36px;margin-bottom:12px}
+.setup-title{font-size:18px;font-weight:700;margin-bottom:6px}
+.setup-sub{font-size:13px;color:var(--text-dim);line-height:1.5}
 
-    .device-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 14px;
-    }
-    .device-name { font-size: 15px; font-weight: 600; }
-    .device-status {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 12px; color: var(--text-dim);
-    }
-    .status-dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--off); transition: background 0.3s;
-    }
-    .status-dot.on { background: var(--on); box-shadow: 0 0 6px var(--on); }
+.step-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:16px;
+}
+.step-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+}
+.step-num{
+  width:24px;height:24px;border-radius:50%;
+  background:var(--accent);color:#fff;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.step-title{font-size:13px;font-weight:600}
+.step-sub{font-size:11px;color:var(--text-dim);margin-top:1px}
 
-    /* Toggle */
-    .toggle-row { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .toggle {
-      position: relative; width: 48px; height: 26px; cursor: pointer;
-    }
-    .toggle input { opacity: 0; width: 0; height: 0; }
-    .toggle-track {
-      position: absolute; inset: 0; background: var(--surface2);
-      border-radius: 13px; border: 1px solid var(--border);
-      transition: background 0.2s, border-color 0.2s;
-    }
-    .toggle input:checked + .toggle-track { background: var(--accent); border-color: var(--accent); }
-    .toggle-thumb {
-      position: absolute; top: 3px; left: 3px;
-      width: 18px; height: 18px; background: #fff;
-      border-radius: 50%; transition: transform 0.2s;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-    }
-    .toggle input:checked ~ .toggle-thumb { transform: translateX(22px); }
-    .toggle-label { font-size: 13px; color: var(--text-dim); }
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11px;color:var(--text-dim);margin-bottom:5px;font-weight:500}
+.field input,.field select{
+  width:100%;background:var(--s3);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 11px;
+  color:var(--text);font-size:13px;outline:none;
+  transition:border-color .15s;
+}
+.field input:focus,.field select:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--text-muted)}
+.field select option{background:var(--s3)}
 
-    /* Sliders */
-    .control-group { margin-bottom: 12px; }
-    .control-label {
-      display: flex; justify-content: space-between;
-      font-size: 12px; color: var(--text-dim); margin-bottom: 7px;
-    }
-    .control-label span:last-child { color: var(--accent2); font-weight: 600; }
+.link{color:var(--accent);font-size:11px;text-decoration:none;display:inline-flex;align-items:center;gap:3px}
+.link:hover{color:#9c8fff}
 
-    input[type=range] {
-      -webkit-appearance: none; width: 100%; height: 4px;
-      background: var(--surface2); border-radius: 2px; outline: none;
-      cursor: pointer;
-    }
-    input[type=range]::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px;
-      border-radius: 50%; background: var(--accent2);
-      box-shadow: 0 0 0 3px rgba(124,106,247,0.25);
-      transition: box-shadow 0.15s;
-    }
-    input[type=range]::-webkit-slider-thumb:hover {
-      box-shadow: 0 0 0 5px rgba(124,106,247,0.35);
-    }
+/* ── QR ── */
+.qr-wrap{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:20px;text-align:center;
+}
+.qr-title{font-size:14px;font-weight:600;margin-bottom:6px}
+.qr-sub{font-size:12px;color:var(--text-dim);margin-bottom:16px;line-height:1.5}
+#qrCanvas{
+  border-radius:10px;background:#fff;padding:10px;
+  display:block;margin:0 auto 14px;
+}
+.qr-status{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  font-size:12px;color:var(--text-dim);
+}
+.pulse-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--accent);
+  animation:pulse 1.4s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.85)}}
 
-    /* Color picker */
-    .color-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
-    .color-preview {
-      width: 36px; height: 36px; border-radius: 10px;
-      border: 2px solid var(--border); cursor: pointer;
-      flex-shrink: 0; transition: border-color 0.2s;
-    }
-    .color-preview:hover { border-color: var(--accent); }
-    input[type=color] { opacity: 0; width: 0; height: 0; position: absolute; }
-    .color-label { font-size: 12px; color: var(--text-dim); }
+/* ── Buttons ── */
+.btn{
+  padding:10px 18px;border-radius:var(--r-sm);border:none;
+  cursor:pointer;font-size:13px;font-weight:600;
+  transition:all .15s;display:inline-flex;align-items:center;
+  justify-content:center;gap:7px;width:100%;
+}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#7c74f7;transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-ghost{
+  background:transparent;color:var(--text-dim);
+  border:1px solid var(--border);
+}
+.btn-ghost:hover{border-color:var(--border2);color:var(--text)}
+.btn-danger{background:rgba(240,71,71,.12);color:var(--off);border:1px solid rgba(240,71,71,.2)}
+.btn-danger:hover{background:rgba(240,71,71,.2)}
 
-    /* Mode tabs */
-    .mode-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
-    .mode-tab {
-      flex: 1; padding: 7px; border-radius: 9px; border: 1px solid var(--border);
-      background: var(--surface2); color: var(--text-dim); font-size: 12px;
-      font-weight: 500; cursor: pointer; text-align: center; transition: all 0.15s;
-    }
-    .mode-tab.active {
-      background: var(--accent); border-color: var(--accent); color: #fff;
-    }
+/* ── Main page ── */
+.section-label{
+  font-size:10px;font-weight:700;letter-spacing:1.5px;
+  text-transform:uppercase;color:var(--text-muted);
+  padding:0 2px;
+}
 
-    /* Config panel */
-    .config-card {
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 16px;
-    }
-    .config-row { margin-bottom: 10px; }
-    .config-row label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 5px; }
-    .config-row input {
-      width: 100%; background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 8px; padding: 8px 10px; color: var(--text);
-      font-size: 13px; outline: none; transition: border-color 0.15s;
-    }
-    .config-row input:focus { border-color: var(--accent); }
+.device-card{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;
+  transition:border-color .2s,box-shadow .2s;
+}
+.device-card.on{
+  border-color:var(--accent-dim);
+  box-shadow:0 0 0 1px var(--accent-dim),inset 0 0 20px var(--accent-glow);
+}
 
-    /* Buttons */
-    .btn {
-      padding: 9px 16px; border-radius: 9px; border: none;
-      cursor: pointer; font-size: 13px; font-weight: 600;
-      transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
-    }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent2); }
-    .btn-ghost { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); }
-    .btn-ghost:hover { color: var(--text); border-color: var(--accent); }
+.dc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dc-info{display:flex;align-items:center;gap:10px}
+.dc-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:var(--s3);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:17px;flex-shrink:0;
+}
+.dc-name{font-size:14px;font-weight:600;line-height:1.2}
+.dc-type{font-size:11px;color:var(--text-dim);margin-top:2px}
 
-    .btn-row { display: flex; gap: 8px; margin-top: 4px; }
+/* Toggle */
+.toggle{position:relative;width:44px;height:24px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.t-track{
+  position:absolute;inset:0;border-radius:12px;
+  background:var(--s3);border:1px solid var(--border);
+  transition:all .2s;
+}
+.toggle input:checked+.t-track{background:var(--accent);border-color:var(--accent)}
+.t-thumb{
+  position:absolute;top:3px;left:3px;
+  width:16px;height:16px;background:#fff;border-radius:50%;
+  transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.4);
+}
+.toggle input:checked~.t-thumb{transform:translateX(20px)}
 
-    /* Toast */
-    .toast {
-      position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%) translateY(60px);
-      background: var(--surface2); border: 1px solid var(--border);
-      border-radius: 10px; padding: 10px 18px; font-size: 13px;
-      color: var(--text); transition: transform 0.25s; z-index: 100;
-      white-space: nowrap;
-    }
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.success { border-color: var(--on); color: var(--on); }
-    .toast.error { border-color: var(--off); color: var(--off); }
-  </style>
+/* Light controls */
+.light-controls,.switch-controls{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+
+.mode-row{display:flex;gap:6px}
+.mode-btn{
+  flex:1;padding:6px;border-radius:7px;
+  border:1px solid var(--border);background:var(--s3);
+  color:var(--text-dim);font-size:11px;font-weight:500;
+  cursor:pointer;text-align:center;transition:all .15s;
+}
+.mode-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.ctrl-group{}
+.ctrl-label{
+  display:flex;justify-content:space-between;
+  font-size:11px;color:var(--text-dim);margin-bottom:6px;
+}
+.ctrl-label span:last-child{color:var(--accent);font-weight:600}
+
+input[type=range]{
+  -webkit-appearance:none;width:100%;height:3px;
+  background:var(--s3);border-radius:2px;outline:none;cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 3px rgba(108,99,245,.2);
+  transition:box-shadow .15s;
+}
+input[type=range]:hover::-webkit-slider-thumb{box-shadow:0 0 0 5px rgba(108,99,245,.3)}
+
+.color-row{display:flex;align-items:center;gap:10px}
+.color-swatch{
+  width:32px;height:32px;border-radius:8px;
+  border:2px solid var(--border);cursor:pointer;flex-shrink:0;
+  transition:border-color .15s;
+}
+.color-swatch:hover{border-color:var(--accent)}
+input[type=color]{opacity:0;width:0;height:0;position:absolute}
+.color-hint{font-size:11px;color:var(--text-dim)}
+
+/* Switch power info */
+.switch-info{
+  display:flex;align-items:center;gap:8px;
+  background:var(--s3);border-radius:8px;padding:9px 12px;
+}
+.switch-info-icon{font-size:16px}
+.switch-info-text{font-size:12px;color:var(--text-dim)}
+.switch-info-val{font-size:13px;font-weight:600;color:var(--text);margin-top:1px}
+
+/* ── Config page ── */
+.cfg-section{
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);padding:14px;
+}
+.cfg-title{font-size:12px;font-weight:700;color:var(--text-dim);margin-bottom:12px;text-transform:uppercase;letter-spacing:.8px}
+
+/* ── Empty state ── */
+.empty{
+  text-align:center;padding:32px 20px;
+  background:var(--s1);border:1px solid var(--border);
+  border-radius:var(--r);
+}
+.empty-icon{font-size:32px;margin-bottom:10px;opacity:.4}
+.empty-text{font-size:13px;color:var(--text-dim);margin-bottom:14px}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:16px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:var(--s2);border:1px solid var(--border2);
+  border-radius:10px;padding:9px 16px;font-size:12px;
+  color:var(--text);z-index:999;transition:transform .25s;
+  white-space:nowrap;pointer-events:none;
+}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(61,214,140,.4);color:var(--on)}
+.toast.err{border-color:rgba(240,71,71,.4);color:var(--off)}
+
+/* ── Nav ── */
+.nav{
+  position:fixed;bottom:0;left:0;right:0;
+  display:flex;background:var(--bg);
+  border-top:1px solid var(--border);
+  padding:8px 16px 10px;gap:4px;
+}
+.nav-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  gap:3px;padding:6px;border-radius:8px;border:none;
+  background:transparent;color:var(--text-muted);cursor:pointer;
+  font-size:10px;font-weight:500;transition:all .15s;
+}
+.nav-btn.active{color:var(--accent);background:var(--accent-glow)}
+.nav-btn:hover:not(.active){color:var(--text-dim)}
+.nav-icon{font-size:18px}
+
+.has-nav .scroll{height:calc(100vh - 53px - 60px)}
+</style>
 </head>
 <body>
 
 <!-- Titlebar -->
 <div class="titlebar">
-  <div class="titlebar-left">
-    <span class="titlebar-icon">💡</span>
-    <span class="titlebar-title">Nexus</span>
+  <div class="tb-left">
+    <div class="tb-logo">⚡</div>
+    <div>
+      <div class="tb-name">Nexus</div>
+    </div>
   </div>
-  <div class="titlebar-controls">
-    <button class="btn-win" onclick="toggleConfig()" title="Paramètres">⚙</button>
-    <button class="btn-win" onclick="window.minimize()">─</button>
-    <button class="btn-win close" onclick="window.close()">✕</button>
+  <div class="tb-controls">
+    <button class="wbtn" onclick="ipc('minimize-window')" title="Réduire">─</button>
+    <button class="wbtn close" onclick="ipc('close-window')" title="Fermer">✕</button>
   </div>
 </div>
 
-<div class="main" id="main">
+<!-- Pages -->
+<div class="scroll" id="scroll">
 
-  <!-- Config Panel (hidden by default) -->
-  <div id="configPanel" style="display:none">
-    <div class="section-title">Configuration API Tuya</div>
-    <div class="config-card">
-      <div class="config-row">
+  <!-- SETUP PAGE -->
+  <div class="page active" id="page-setup">
+    <div class="setup-hero">
+      <div class="setup-icon">⚡</div>
+      <div class="setup-title">Bienvenue sur Nexus</div>
+      <div class="setup-sub">Contrôlez tous vos appareils Tuya / Smart Life depuis un seul endroit.</div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">1</div>
+        <div>
+          <div class="step-title">Créer un projet Tuya IoT</div>
+          <div class="step-sub">Gratuit — 2 minutes</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text-dim);line-height:1.6;margin-bottom:10px">
+        Rendez-vous sur <a class="link" href="#" onclick="shell('https://iot.tuya.com')">iot.tuya.com ↗</a>, créez un projet <strong style="color:var(--text)">Smart Home</strong> avec le Data Center <strong style="color:var(--text)">Central Europe</strong>, puis autorisez les API suggérées.
+      </p>
+      <p style="font-size:12px;color:var(--text-dim);line-height:1.6">
+        Ensuite, dans <strong style="color:var(--text)">Devices → Link App Account</strong>, liez votre compte Smart Life via QR code.
+      </p>
+    </div>
+
+    <div class="step-card">
+      <div class="step-header">
+        <div class="step-num">2</div>
+        <div>
+          <div class="step-title">Entrez vos clés API</div>
+          <div class="step-sub">Trouvées sur la page de votre projet</div>
+        </div>
+      </div>
+      <div class="field">
         <label>Client ID</label>
-        <input id="cfgClientId" type="text" placeholder="7ghm3r5ytan8u3ysnrxr"/>
+        <input id="s-cid" type="text" placeholder="ex: 7ghm3r5ytan8u3ysnrxr"/>
       </div>
-      <div class="config-row">
+      <div class="field">
         <label>Client Secret</label>
-        <input id="cfgClientSecret" type="password" placeholder="••••••••••••••••"/>
+        <input id="s-secret" type="password" placeholder="••••••••••••••••••••••••••••••••"/>
       </div>
-      <div class="config-row">
+      <div class="field">
         <label>Région</label>
-        <input id="cfgRegion" type="text" value="eu" placeholder="eu"/>
+        <select id="s-region">
+          <option value="eu">Central Europe (EU) — recommandé France</option>
+          <option value="us">Western America (US)</option>
+          <option value="in">India (IN)</option>
+          <option value="cn">China (CN)</option>
+        </select>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-primary" onclick="saveConfig()">💾 Sauvegarder</button>
-        <button class="btn btn-ghost" onclick="toggleConfig()">Annuler</button>
-      </div>
-    </div>
-
-    <div class="section-title" style="margin-top:14px">Appareils</div>
-    <div class="config-card">
-      <div id="deviceConfigList"></div>
-      <button class="btn btn-ghost" style="width:100%;margin-top:8px" onclick="addDevice()">+ Ajouter un appareil</button>
+      <button class="btn btn-primary" onclick="setupSave()">Continuer →</button>
     </div>
   </div>
 
-  <!-- Main Panel -->
-  <div id="mainPanel">
-    <div class="section-title">Mes ampoules</div>
-    <div id="deviceList"></div>
+  <!-- MAIN PAGE -->
+  <div class="page" id="page-main">
+    <div class="section-label">Mes appareils</div>
+    <div id="device-list">
+      <div class="empty">
+        <div class="empty-icon">📡</div>
+        <div class="empty-text">Chargement des appareils…</div>
+      </div>
+    </div>
   </div>
 
+  <!-- CONFIG PAGE -->
+  <div class="page" id="page-config">
+    <div class="cfg-section">
+      <div class="cfg-title">Connexion API</div>
+      <div class="field">
+        <label>Client ID</label>
+        <input id="c-cid" type="text"/>
+      </div>
+      <div class="field">
+        <label>Client Secret</label>
+        <input id="c-secret" type="password"/>
+      </div>
+      <div class="field">
+        <label>Région</label>
+        <select id="c-region">
+          <option value="eu">Central Europe (EU)</option>
+          <option value="us">Western America (US)</option>
+          <option value="in">India (IN)</option>
+          <option value="cn">China (CN)</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" onclick="configSave()">💾 Sauvegarder</button>
+    </div>
+    <div class="cfg-section">
+      <div class="cfg-title">Appareils</div>
+      <button class="btn btn-ghost" onclick="loadDevices()">🔄 Rafraîchir les appareils</button>
+    </div>
+    <div class="cfg-section">
+      <div class="cfg-title">Danger</div>
+      <button class="btn btn-danger" onclick="resetApp()">Réinitialiser Nexus</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Nav (hidden until configured) -->
+<div class="nav" id="nav" style="display:none">
+  <button class="nav-btn active" id="nav-main" onclick="showPage('main')">
+    <span class="nav-icon">⚡</span>Appareils
+  </button>
+  <button class="nav-btn" id="nav-config" onclick="showPage('config')">
+    <span class="nav-icon">⚙️</span>Réglages
+  </button>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-const { ipcRenderer } = require('electron');
-const { getCurrentWindow } = require('@electron/remote') || {};
+const { ipcRenderer, shell: electronShell } = require('electron');
 
-// Window controls
-window.minimize = () => { try { require('electron').remote.getCurrentWindow().minimize(); } catch {} };
-window.close    = () => { try { require('electron').remote.getCurrentWindow().close(); } catch(e) { ipcRenderer.send('close-window'); } };
+function ipc(ch, ...args) { return ipcRenderer.invoke(ch, ...args); }
+function shell(url) { electronShell.openExternal(url); }
 
-// ─── State ────────────────────────────────────────────────────────────────────
-let config = { clientId: '', clientSecret: '', region: 'eu', devices: [] };
-let deviceStates = {};
+// ── State ──────────────────────────────────────────────────────────────────
+let devices = [];
+let devStates = {};
+let currentPage = 'setup';
 
-// ─── Init ─────────────────────────────────────────────────────────────────────
+// ── Init ───────────────────────────────────────────────────────────────────
 async function init() {
-  config = await ipcRenderer.invoke('get-config');
+  const configured = await ipc('is-configured');
+  if (configured) {
+    showNav();
+    showPage('main');
+    loadDevices();
+  }
+}
 
-  // Pre-fill defaults if empty
-  if (!config.devices || config.devices.length === 0) {
-    config.devices = [
-      { id: 'bf685831b2535c78dezqnx', name: 'Ampoule 1' },
-      { id: 'bf52db492af411c028kqeb',  name: 'Ampoule 2' }
-    ];
+// ── Navigation ─────────────────────────────────────────────────────────────
+function showNav() {
+  document.getElementById('nav').style.display = 'flex';
+  document.getElementById('scroll').classList.add('has-nav');
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const nb = document.getElementById('nav-' + name);
+  if (nb) nb.classList.add('active');
+  currentPage = name;
+
+  if (name === 'config') prefillConfig();
+}
+
+// ── Setup ──────────────────────────────────────────────────────────────────
+async function setupSave() {
+  const clientId = document.getElementById('s-cid').value.trim();
+  const clientSecret = document.getElementById('s-secret').value.trim();
+  const region = document.getElementById('s-region').value;
+  if (!clientId || !clientSecret) { toast('Renseignez les deux clés', 'err'); return; }
+  await ipc('save-config', { clientId, clientSecret, region });
+  showNav();
+  showPage('main');
+  loadDevices();
+  toast('Configuration sauvegardée ✓', 'ok');
+}
+
+// ── Config ─────────────────────────────────────────────────────────────────
+async function prefillConfig() {
+  const cfg = await ipc('get-config');
+  document.getElementById('c-cid').value = cfg.clientId || '';
+  document.getElementById('c-secret').value = cfg.clientSecret || '';
+  document.getElementById('c-region').value = cfg.region || 'eu';
+}
+
+async function configSave() {
+  const clientId = document.getElementById('c-cid').value.trim();
+  const clientSecret = document.getElementById('c-secret').value.trim();
+  const region = document.getElementById('c-region').value;
+  await ipc('save-config', { clientId, clientSecret, region });
+  toast('Sauvegardé ✓', 'ok');
+  loadDevices();
+}
+
+function resetApp() {
+  if (!confirm('Réinitialiser Nexus ? Votre configuration sera effacée.')) return;
+  ipc('save-config', { clientId: '', clientSecret: '', region: 'eu' });
+  location.reload();
+}
+
+// ── Devices ────────────────────────────────────────────────────────────────
+async function loadDevices() {
+  const list = document.getElementById('device-list');
+  list.innerHTML = `<div class="empty"><div class="empty-icon">📡</div><div class="empty-text">Chargement…</div></div>`;
+  const res = await ipc('get-devices');
+  if (!res.success) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">${res.msg || 'Erreur de connexion'}</div><button class="btn btn-ghost" style="margin-top:10px;width:auto;padding:8px 16px" onclick="loadDevices()">Réessayer</button></div>`;
+    return;
+  }
+  devices = res.result?.devices || res.result?.list || [];
+  if (!devices.length) {
+    list.innerHTML = `<div class="empty"><div class="empty-icon">🔌</div><div class="empty-text">Aucun appareil trouvé.<br>Vérifiez que vos appareils sont liés sur iot.tuya.com</div></div>`;
+    return;
+  }
+  list.innerHTML = '';
+  for (const d of devices) {
+    const statusRes = await ipc('get-device-status', d.id);
+    const dps = {};
+    if (statusRes.success) statusRes.result?.forEach(s => { dps[s.code] = s.value; });
+    devStates[d.id] = dps;
+    list.appendChild(buildCard(d, dps));
+  }
+}
+
+function buildCard(d, dps) {
+  const cat = d._category || d.category;
+  const isLight = cat === 'light';
+  const isSwitch = cat === 'switch';
+  const isOn = dps.switch_led ?? dps.switch_1 ?? dps.switch ?? false;
+  const mode = dps.work_mode || 'white';
+
+  const card = document.createElement('div');
+  card.className = `device-card${isOn ? ' on' : ''}`;
+  card.id = `dc-${d.id}`;
+
+  const icon = isLight ? '💡' : isSwitch ? '🔌' : '📟';
+  const typeLabel = isLight ? 'Ampoule' : isSwitch ? 'Prise connectée' : 'Appareil';
+
+  let controls = '';
+
+  if (isLight) {
+    const bright = dps.bright_value_v2 || 500;
+    const temp = dps.temp_value_v2 || 500;
+    const h = dps.colour_data_v2?.h || 0;
+    const s = Math.round((dps.colour_data_v2?.s || 0) / 10);
+    const v = Math.round((dps.colour_data_v2?.v || 500) / 10);
+    const hexColor = hsvToHex(h, s / 100, v / 100);
+
+    controls = `
+    <div class="light-controls" id="lc-${d.id}">
+      <div class="mode-row">
+        <div class="mode-btn${mode === 'white' ? ' active' : ''}" onclick="setMode('${d.id}','white')">☀ Blanc</div>
+        <div class="mode-btn${mode === 'colour' ? ' active' : ''}" onclick="setMode('${d.id}','colour')">🎨 Couleur</div>
+      </div>
+      <div id="white-${d.id}" style="${mode !== 'white' ? 'display:none' : ''}">
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>Luminosité</span><span id="bv-${d.id}">${bright}</span></div>
+          <input type="range" min="10" max="1000" value="${bright}"
+            oninput="document.getElementById('bv-${d.id}').textContent=this.value"
+            onchange="sendCmd('${d.id}',[{code:'work_mode',value:'white'},{code:'bright_value_v2',value:+this.value}])">
+        </div>
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>Température</span><span id="tv-${d.id}">${temp <= 500 ? 'Chaud' : 'Froid'}</span></div>
+          <input type="range" min="0" max="1000" value="${temp}"
+            oninput="document.getElementById('tv-${d.id}').textContent=+this.value<=500?'Chaud':'Froid'"
+            onchange="sendCmd('${d.id}',[{code:'work_mode',value:'white'},{code:'temp_value_v2',value:+this.value}])">
+        </div>
+      </div>
+      <div id="colour-${d.id}" style="${mode !== 'colour' ? 'display:none' : ''}">
+        <div class="color-row">
+          <div class="color-swatch" id="swatch-${d.id}" style="background:${hexColor}" onclick="document.getElementById('cp-${d.id}').click()"></div>
+          <input type="color" id="cp-${d.id}" value="${hexColor}" oninput="onColorChange('${d.id}',this.value)">
+          <div class="color-hint">Choisir une couleur</div>
+        </div>
+        <div class="ctrl-group">
+          <div class="ctrl-label"><span>Intensité</span><span id="cv-${d.id}">${v * 10}</span></div>
+          <input type="range" min="0" max="1000" value="${v * 10}"
+            oninput="document.getElementById('cv-${d.id}').textContent=this.value"
+            onchange="applyColor('${d.id}',null,null,+this.value)">
+        </div>
+      </div>
+    </div>`;
   }
 
-  renderDevices();
-  refreshAllStatus();
-}
+  if (isSwitch) {
+    const cur = dps.cur_power != null ? (dps.cur_power / 10).toFixed(1) + ' W' : '—';
+    const volt = dps.cur_voltage != null ? (dps.cur_voltage / 10).toFixed(0) + ' V' : '—';
+    controls = `
+    <div class="switch-controls">
+      <div style="display:flex;gap:8px">
+        <div class="switch-info" style="flex:1">
+          <div class="switch-info-icon">⚡</div>
+          <div><div class="switch-info-text">Puissance</div><div class="switch-info-val" id="sw-pow-${d.id}">${cur}</div></div>
+        </div>
+        <div class="switch-info" style="flex:1">
+          <div class="switch-info-icon">🔋</div>
+          <div><div class="switch-info-text">Tension</div><div class="switch-info-val" id="sw-vol-${d.id}">${volt}</div></div>
+        </div>
+      </div>
+    </div>`;
+  }
 
-// ─── Render Devices ───────────────────────────────────────────────────────────
-function renderDevices() {
-  const list = document.getElementById('deviceList');
-  list.innerHTML = '';
+  const toggleCode = isLight ? 'switch_led' : 'switch_1';
 
-  config.devices.forEach(device => {
-    deviceStates[device.id] = deviceStates[device.id] || { on: false, mode: 'white', brightness: 500, temp: 500, h: 0, s: 0, v: 500 };
-    list.appendChild(createDeviceCard(device));
-  });
-}
-
-function createDeviceCard(device) {
-  const s = deviceStates[device.id];
-  const card = document.createElement('div');
-  card.className = `device-card ${s.on ? 'active' : ''}`;
-  card.id = `card-${device.id}`;
   card.innerHTML = `
-    <div class="device-header">
-      <span class="device-name">${device.name}</span>
-      <div class="device-status">
-        <div class="status-dot ${s.on ? 'on' : ''}" id="dot-${device.id}"></div>
-        <span id="statusText-${device.id}">${s.on ? 'Allumée' : 'Éteinte'}</span>
+    <div class="dc-top">
+      <div class="dc-info">
+        <div class="dc-icon">${icon}</div>
+        <div>
+          <div class="dc-name">${d.name || 'Appareil'}</div>
+          <div class="dc-type">${typeLabel} · ${isOn ? '<span style="color:var(--on)">Allumé</span>' : '<span style="color:var(--text-muted)">Éteint</span>'}</div>
+        </div>
       </div>
-    </div>
-
-    <div class="mode-tabs">
-      <div class="mode-tab ${s.mode === 'white' ? 'active' : ''}" onclick="setMode('${device.id}', 'white')">⬜ Blanc</div>
-      <div class="mode-tab ${s.mode === 'colour' ? 'active' : ''}" onclick="setMode('${device.id}', 'colour')">🎨 Couleur</div>
-    </div>
-
-    <div class="toggle-row">
       <label class="toggle">
-        <input type="checkbox" ${s.on ? 'checked' : ''} onchange="toggleDevice('${device.id}', this.checked)" id="toggle-${device.id}">
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
+        <input type="checkbox" ${isOn ? 'checked' : ''} onchange="toggleDevice('${d.id}','${toggleCode}',this.checked)" id="tog-${d.id}">
+        <div class="t-track"></div>
+        <div class="t-thumb"></div>
       </label>
-      <span class="toggle-label">${s.on ? 'Allumée' : 'Éteinte'}</span>
     </div>
-
-    <div id="white-controls-${device.id}" style="${s.mode !== 'white' ? 'display:none' : ''}">
-      <div class="control-group">
-        <div class="control-label"><span>☀ Luminosité</span><span id="brightVal-${device.id}">${s.brightness}</span></div>
-        <input type="range" min="10" max="1000" value="${s.brightness}"
-          oninput="updateBrightLabel('${device.id}', this.value)"
-          onchange="setBrightness('${device.id}', this.value)"
-          id="bright-${device.id}">
-      </div>
-      <div class="control-group">
-        <div class="control-label"><span>🌡 Température</span><span id="tempVal-${device.id}">${s.temp <= 500 ? 'Chaud' : 'Froid'}</span></div>
-        <input type="range" min="0" max="1000" value="${s.temp}"
-          oninput="updateTempLabel('${device.id}', this.value)"
-          onchange="setTemp('${device.id}', this.value)"
-          id="temp-${device.id}">
-      </div>
-    </div>
-
-    <div id="colour-controls-${device.id}" style="${s.mode !== 'colour' ? 'display:none' : ''}">
-      <div class="color-row">
-        <div class="color-preview" id="colorPreview-${device.id}" style="background: hsl(${s.h},100%,50%)" onclick="openColorPicker('${device.id}')"></div>
-        <input type="color" id="colorPicker-${device.id}" oninput="onColorPick('${device.id}', this.value)">
-        <span class="color-label">Cliquez pour choisir la couleur</span>
-      </div>
-      <div class="control-group">
-        <div class="control-label"><span>✨ Intensité</span><span id="colorBrightVal-${device.id}">${s.v}</span></div>
-        <input type="range" min="0" max="1000" value="${s.v}"
-          oninput="updateColorBrightLabel('${device.id}', this.value)"
-          onchange="applyColorBright('${device.id}', this.value)"
-          id="colorBright-${device.id}">
-      </div>
-    </div>
+    ${isOn ? controls : `<div id="hidden-controls-${d.id}" style="display:none">${controls}</div>`}
   `;
+
+  if (!isOn) {
+    // store controls for when turned on
+    card._controls = controls;
+  }
+
   return card;
 }
 
-// ─── Controls ────────────────────────────────────────────────────────────────
-async function toggleDevice(id, on) {
-  const res = await ipcRenderer.invoke(on ? 'turn-on' : 'turn-off', id);
-  if (res.success) {
-    deviceStates[id].on = on;
-    updateCardState(id);
-    toast(on ? '💡 Allumée' : '🌙 Éteinte', 'success');
+// ── Device Controls ────────────────────────────────────────────────────────
+async function toggleDevice(id, code, on) {
+  const res = await sendCmd(id, [{ code, value: on }]);
+  if (res && res.success) {
+    const card = document.getElementById(`dc-${id}`);
+    if (!card) return;
+    card.classList.toggle('on', on);
+    // Update type text
+    const typeEl = card.querySelector('.dc-type');
+    const d = devices.find(x => x.id === id);
+    const typeLabel = d?._category === 'light' ? 'Ampoule' : d?._category === 'switch' ? 'Prise connectée' : 'Appareil';
+    if (typeEl) typeEl.innerHTML = `${typeLabel} · ${on ? '<span style="color:var(--on)">Allumé</span>' : '<span style="color:var(--text-muted)">Éteint</span>'}`;
+    toast(on ? '✓ Allumé' : '✓ Éteint', 'ok');
   } else {
-    toast('Erreur: ' + res.msg, 'error');
-    document.getElementById(`toggle-${id}`).checked = !on;
+    document.getElementById(`tog-${id}`).checked = !on;
+    toast('Erreur de connexion', 'err');
   }
-}
-
-async function setBrightness(id, value) {
-  const res = await ipcRenderer.invoke('set-brightness', id, parseInt(value));
-  if (!res.success) toast('Erreur luminosité', 'error');
-}
-
-async function setTemp(id, value) {
-  const res = await ipcRenderer.invoke('set-temp', id, parseInt(value));
-  if (!res.success) toast('Erreur température', 'error');
 }
 
 function setMode(id, mode) {
-  deviceStates[id].mode = mode;
-  document.querySelectorAll(`#card-${id} .mode-tab`).forEach((t, i) => {
-    t.classList.toggle('active', (i === 0 && mode === 'white') || (i === 1 && mode === 'colour'));
-  });
-  document.getElementById(`white-controls-${id}`).style.display = mode === 'white' ? '' : 'none';
-  document.getElementById(`colour-controls-${id}`).style.display = mode === 'colour' ? '' : 'none';
-}
-
-function openColorPicker(id) {
-  document.getElementById(`colorPicker-${id}`).click();
-}
-
-function onColorPick(id, hex) {
-  document.getElementById(`colorPreview-${id}`).style.background = hex;
-  const [h, s, v] = hexToHSV(hex);
-  deviceStates[id] = { ...deviceStates[id], h, s, v };
-  ipcRenderer.invoke('set-color', id, h, Math.round(s * 1000), Math.round(v * 1000));
-}
-
-function applyColorBright(id, value) {
-  const s = deviceStates[id];
-  deviceStates[id].v = parseInt(value);
-  ipcRenderer.invoke('set-color', id, s.h, Math.round(s.s * 1000), parseInt(value));
-}
-
-// ─── Labels ───────────────────────────────────────────────────────────────────
-function updateBrightLabel(id, v) {
-  document.getElementById(`brightVal-${id}`).textContent = v;
-  deviceStates[id].brightness = parseInt(v);
-}
-function updateTempLabel(id, v) {
-  document.getElementById(`tempVal-${id}`).textContent = parseInt(v) <= 500 ? 'Chaud' : 'Froid';
-  deviceStates[id].temp = parseInt(v);
-}
-function updateColorBrightLabel(id, v) {
-  document.getElementById(`colorBrightVal-${id}`).textContent = v;
-}
-
-// ─── Status ───────────────────────────────────────────────────────────────────
-async function refreshAllStatus() {
-  for (const device of config.devices) {
-    const res = await ipcRenderer.invoke('get-status', device.id);
-    if (res.success && res.result) {
-      const dps = {};
-      res.result.forEach(dp => { dps[dp.code] = dp.value; });
-      deviceStates[device.id] = {
-        on: dps.switch_led || false,
-        mode: dps.work_mode || 'white',
-        brightness: dps.bright_value_v2 || 500,
-        temp: dps.temp_value_v2 || 500,
-        h: dps.colour_data_v2?.h || 0,
-        s: (dps.colour_data_v2?.s || 0) / 1000,
-        v: dps.colour_data_v2?.v || 500
-      };
-    }
-  }
-  renderDevices();
-}
-
-function updateCardState(id) {
-  const s = deviceStates[id];
-  const card = document.getElementById(`card-${id}`);
-  if (!card) return;
-  card.classList.toggle('active', s.on);
-  document.getElementById(`dot-${id}`).className = `status-dot ${s.on ? 'on' : ''}`;
-  document.getElementById(`statusText-${id}`).textContent = s.on ? 'Allumée' : 'Éteinte';
-}
-
-// ─── Config panel ─────────────────────────────────────────────────────────────
-function toggleConfig() {
-  const panel = document.getElementById('configPanel');
-  const main  = document.getElementById('mainPanel');
-  const show  = panel.style.display === 'none';
-  panel.style.display = show ? '' : 'none';
-  main.style.display  = show ? 'none' : '';
-  if (show) {
-    document.getElementById('cfgClientId').value     = config.clientId;
-    document.getElementById('cfgClientSecret').value = config.clientSecret;
-    document.getElementById('cfgRegion').value       = config.region;
-    renderDeviceConfig();
-  }
-}
-
-function renderDeviceConfig() {
-  const list = document.getElementById('deviceConfigList');
-  list.innerHTML = '';
-  config.devices.forEach((d, i) => {
-    list.innerHTML += `
-      <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
-        <input style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none"
-          value="${d.name}" placeholder="Nom" oninput="config.devices[${i}].name = this.value">
-        <input style="flex:2;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--text);font-size:13px;outline:none"
-          value="${d.id}" placeholder="Device ID" oninput="config.devices[${i}].id = this.value">
-        <button class="btn btn-ghost" style="padding:7px 10px" onclick="removeDevice(${i})">✕</button>
-      </div>`;
+  document.getElementById(`white-${id}`).style.display = mode === 'white' ? '' : 'none';
+  document.getElementById(`colour-${id}`).style.display = mode === 'colour' ? '' : 'none';
+  document.querySelectorAll(`#lc-${id} .mode-btn`).forEach((b, i) => {
+    b.classList.toggle('active', (i === 0 && mode === 'white') || (i === 1 && mode === 'colour'));
   });
 }
 
-function addDevice() {
-  config.devices.push({ id: '', name: 'Nouvelle ampoule' });
-  renderDeviceConfig();
+let colorTimers = {};
+function onColorChange(id, hex) {
+  document.getElementById(`swatch-${id}`).style.background = hex;
+  clearTimeout(colorTimers[id]);
+  colorTimers[id] = setTimeout(() => {
+    const [h, s, v] = hexToHSV(hex);
+    const vSlider = document.getElementById(`cv-${id}`);
+    const vVal = vSlider ? parseInt(vSlider.value) : 1000;
+    sendCmd(id, [
+      { code: 'work_mode', value: 'colour' },
+      { code: 'colour_data_v2', value: { h, s: Math.round(s * 1000), v: vVal } }
+    ]);
+  }, 200);
 }
 
-function removeDevice(i) {
-  config.devices.splice(i, 1);
-  renderDeviceConfig();
+function applyColor(id, h, s, v) {
+  const picker = document.getElementById(`cp-${id}`);
+  if (picker && (h === null)) {
+    const [ph, ps] = hexToHSV(picker.value);
+    h = ph; s = Math.round(ps * 1000);
+  }
+  sendCmd(id, [
+    { code: 'work_mode', value: 'colour' },
+    { code: 'colour_data_v2', value: { h, s, v } }
+  ]);
 }
 
-async function saveConfig() {
-  config.clientId     = document.getElementById('cfgClientId').value.trim();
-  config.clientSecret = document.getElementById('cfgClientSecret').value.trim();
-  config.region       = document.getElementById('cfgRegion').value.trim();
-  await ipcRenderer.invoke('save-config', config);
-  toast('Configuration sauvegardée ✓', 'success');
-  toggleConfig();
-  renderDevices();
-  refreshAllStatus();
+async function sendCmd(id, commands) {
+  const res = await ipc('send-command', id, commands);
+  if (!res.success) toast(res.msg || 'Erreur', 'err');
+  return res;
 }
 
-// ─── Utils ────────────────────────────────────────────────────────────────────
+// ── Utils ──────────────────────────────────────────────────────────────────
 function hexToHSV(hex) {
   let r = parseInt(hex.slice(1,3),16)/255;
   let g = parseInt(hex.slice(3,5),16)/255;
@@ -512,11 +712,21 @@ function hexToHSV(hex) {
   return [h, s, v];
 }
 
+function hsvToHex(h, s, v) {
+  let r, g, b;
+  const i = Math.floor(h / 60) % 6;
+  const f = h / 60 - Math.floor(h / 60);
+  const p = v * (1 - s), q = v * (1 - f * s), t = v * (1 - (1 - f) * s);
+  [r,g,b] = [[v,t,p],[q,v,p],[p,v,t],[p,q,v],[t,p,v],[v,p,q]][i];
+  return '#' + [r,g,b].map(x => Math.round(x*255).toString(16).padStart(2,'0')).join('');
+}
+
 function toast(msg, type = '') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.className = `toast ${type} show`;
-  setTimeout(() => t.className = 'toast', 2500);
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.className = 'toast', 2500);
 }
 
 init();
